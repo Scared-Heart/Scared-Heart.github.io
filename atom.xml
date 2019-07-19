@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hugo fabric theme</title>
-    <link>https://example.org/</link>
-    <description>Recent content on Hugo fabric theme</description>
+    <title>apple pie</title>
+    <link>https://scared-heart.github.io/</link>
+    <description>Recent content on apple pie</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Fri, 19 Jul 2019 15:19:33 +0800</lastBuildDate>
     
-	<atom:link href="https://example.org/atom.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://scared-heart.github.io/atom.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>TestHugo</title>
+      <link>https://scared-heart.github.io/testhugo/</link>
+      <pubDate>Fri, 19 Jul 2019 15:19:33 +0800</pubDate>
+      
+      <guid>https://scared-heart.github.io/testhugo/</guid>
+      <description> 为什么要创建这个文档??? WHY WOULD I CREATE THIS DOCUMENT??? </description>
+    </item>
+    
+    <item>
+      <title>HelloHugo</title>
+      <link>https://scared-heart.github.io/hellohugo/</link>
+      <pubDate>Fri, 19 Jul 2019 14:58:10 +0800</pubDate>
+      
+      <guid>https://scared-heart.github.io/hellohugo/</guid>
+      <description> 这是hugo初体验&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;
+ this is my first time using hugo&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;
+  </description>
+    </item>
     
   </channel>
 </rss>
