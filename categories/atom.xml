@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on apple pie</title>
-    <link>https://scared-heart.github.io/categories/</link>
+    <link>http://scared-heart.github.io/categories/</link>
     <description>Recent content in Categories on apple pie</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="https://scared-heart.github.io/categories/atom.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://scared-heart.github.io/categories/atom.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
