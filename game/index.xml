@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Games on apple pie</title>
+    <link>https://scared-heart.github.io/game/</link>
+    <description>Recent content in Games on apple pie</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 07 Jan 2020 17:24:34 +0800</lastBuildDate>
+    
+	<atom:link href="https://scared-heart.github.io/game/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>MyGamepaper</title>
+      <link>https://scared-heart.github.io/game/mygamepaper/</link>
+      <pubDate>Tue, 07 Jan 2020 17:24:34 +0800</pubDate>
+      
+      <guid>https://scared-heart.github.io/game/mygamepaper/</guid>
+      <description>here is my first game blog~~~</description>
+    </item>
+    
+  </channel>
+</rss>
