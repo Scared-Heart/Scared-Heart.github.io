@@ -1,47 +1,60 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://scared-heart.github.io/game/</loc>
-    <lastmod>2020-01-07T17:24:34+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://scared-heart.github.io/game/mygamepaper/</loc>
-    <lastmod>2020-01-07T17:24:34+08:00</lastmod>
+    <loc>https://scared-heart.github.io/about/</loc>
+    <lastmod>2020-08-06T18:24:10+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://scared-heart.github.io/</loc>
-    <lastmod>2020-01-07T17:24:34+08:00</lastmod>
-    <priority>0</priority>
+    <lastmod>2020-08-06T18:24:10+08:00</lastmod>
   </url>
   
   <url>
-    <loc>https://scared-heart.github.io/anormalday/</loc>
-    <lastmod>2019-07-24T19:40:31+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://scared-heart.github.io/testpage/</loc>
-    <lastmod>2019-07-22T17:41:21+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://scared-heart.github.io/hellohugo/</loc>
-    <lastmod>2019-07-19T14:58:10+08:00</lastmod>
+    <loc>https://scared-heart.github.io/about/me/</loc>
+    <lastmod>2020-08-06T18:24:10+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://scared-heart.github.io/categories/</loc>
-    <priority>0</priority>
+    <lastmod>2020-05-24T19:40:31+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://scared-heart.github.io/posts/</loc>
+    <lastmod>2020-05-24T19:40:31+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://scared-heart.github.io/tags/</loc>
-    <priority>0</priority>
+    <lastmod>2020-05-24T19:40:31+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://scared-heart.github.io/posts/v2ray%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%95%99%E7%A8%8Bwss-/</loc>
+    <lastmod>2020-05-24T19:40:31+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://scared-heart.github.io/tags/%E6%90%AD%E6%A2%AF%E5%AD%90%E7%9A%84%E5%AD%A6%E9%97%AE/</loc>
+    <lastmod>2020-05-24T19:40:31+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://scared-heart.github.io/categories/%E7%BD%91%E7%BB%9C/</loc>
+    <lastmod>2020-05-24T19:40:31+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://scared-heart.github.io/posts/anormalday/</loc>
+    <lastmod>2019-07-24T19:40:31+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://scared-heart.github.io/posts/hellohugo/</loc>
+    <lastmod>2019-07-19T14:58:10+08:00</lastmod>
   </url>
   
 </urlset>

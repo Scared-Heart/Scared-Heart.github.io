@@ -1,14 +1,24 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on apple pie</title>
+    <title>Tags on Breeze</title>
     <link>https://scared-heart.github.io/tags/</link>
-    <description>Recent content in Tags on apple pie</description>
+    <description>Recent content in Tags on Breeze</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <lastBuildDate>Sun, 24 May 2020 19:40:31 +0800</lastBuildDate>
     
 	<atom:link href="https://scared-heart.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>搭梯子的学问</title>
+      <link>https://scared-heart.github.io/tags/%E6%90%AD%E6%A2%AF%E5%AD%90%E7%9A%84%E5%AD%A6%E9%97%AE/</link>
+      <pubDate>Sun, 24 May 2020 19:40:31 +0800</pubDate>
+      
+      <guid>https://scared-heart.github.io/tags/%E6%90%AD%E6%A2%AF%E5%AD%90%E7%9A%84%E5%AD%A6%E9%97%AE/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

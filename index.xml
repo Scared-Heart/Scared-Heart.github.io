@@ -1,52 +1,58 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>apple pie</title>
+    <title>Breeze</title>
     <link>https://scared-heart.github.io/</link>
-    <description>Recent content on apple pie</description>
+    <description>Recent content on Breeze</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jan 2020 17:24:34 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 06 Aug 2020 18:24:10 +0800</lastBuildDate>
     
 	<atom:link href="https://scared-heart.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>MyGamepaper</title>
-      <link>https://scared-heart.github.io/game/mygamepaper/</link>
-      <pubDate>Tue, 07 Jan 2020 17:24:34 +0800</pubDate>
+      <title>Me</title>
+      <link>https://scared-heart.github.io/about/me/</link>
+      <pubDate>Thu, 06 Aug 2020 18:24:10 +0800</pubDate>
       
-      <guid>https://scared-heart.github.io/game/mygamepaper/</guid>
-      <description>here is my first game blog~~~</description>
+      <guid>https://scared-heart.github.io/about/me/</guid>
+      <description>出生于1997年
+一个简单，沙雕的人。</description>
+    </item>
+    
+    <item>
+      <title>V2ray快速搭建教程(WSS)</title>
+      <link>https://scared-heart.github.io/posts/v2ray%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%95%99%E7%A8%8Bwss-/</link>
+      <pubDate>Sun, 24 May 2020 19:40:31 +0800</pubDate>
+      
+      <guid>https://scared-heart.github.io/posts/v2ray%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%95%99%E7%A8%8Bwss-/</guid>
+      <description>服务端(建议debian9) 1.搞环境   首先买好境外服务器 比如vultr 搬瓦工啥的 能够ssh连上（不懂百度怎么ssh : D
+  默认debian可能没有curl，命令下一个
+  apt-get install curl  去买个域名来伪装ip 我推荐namecheap买，靠谱便宜，自带dns解析服务还不错（需要visa卡）
+ 还是推荐国外域名 好处有不用备案以及dns解析靠谱（我被阿里云解析炸过，有阴影    随便买个最便宜的就行了，越长越便宜（辨识度低）
+  把域名解析到服务器ip
+  ​
+照图配置dns解析2.安装233boy写的快速配置脚本，  输入命令，选4 WebSocket+TLS  bash &amp;lt;(curl -s -L https://git.io/v2ray.sh) 随机端口，填写自己买好的域名地址，脚本会自动进行dns解析判断，必须解析对才能继续下一步,反代安装默认的caddy就行   记得开启伪装 分流路径随便敲个字符串就行   配置好就是这个样子奥   输入命令  v2ray url 复制好这个字符串到剪贴板,这就是服务器配置信息  3.安装BBRPlus加速  装下载工具  apt-get install wget 打脚本，按照界面走就行了 这里直接上图片  wget --no-check-certificate -O tcp.</description>
     </item>
     
     <item>
       <title>平凡的一天</title>
-      <link>https://scared-heart.github.io/anormalday/</link>
+      <link>https://scared-heart.github.io/posts/anormalday/</link>
       <pubDate>Wed, 24 Jul 2019 19:40:31 +0800</pubDate>
       
-      <guid>https://scared-heart.github.io/anormalday/</guid>
+      <guid>https://scared-heart.github.io/posts/anormalday/</guid>
       <description>今天是平凡的一天,上班打卡下班打卡.</description>
     </item>
     
     <item>
-      <title>TestPage</title>
-      <link>https://scared-heart.github.io/testpage/</link>
-      <pubDate>Mon, 22 Jul 2019 17:41:21 +0800</pubDate>
-      
-      <guid>https://scared-heart.github.io/testpage/</guid>
-      <description>这是一个测试File&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;..
-This is a test file&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;.</description>
-    </item>
-    
-    <item>
       <title>HelloHugo</title>
-      <link>https://scared-heart.github.io/hellohugo/</link>
+      <link>https://scared-heart.github.io/posts/hellohugo/</link>
       <pubDate>Fri, 19 Jul 2019 14:58:10 +0800</pubDate>
       
-      <guid>https://scared-heart.github.io/hellohugo/</guid>
-      <description> 这是hugo初体验&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;
- this is my first time using hugo&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;
+      <guid>https://scared-heart.github.io/posts/hellohugo/</guid>
+      <description>  这是hugo初体验&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;
+  this is my first time using hugo&amp;hellip;&amp;hellip;&amp;hellip;&amp;hellip;
   </description>
     </item>
     
