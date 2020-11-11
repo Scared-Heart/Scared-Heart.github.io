@@ -15,7 +15,7 @@
 2.新建要挂载的目录并赋权12mkdir sharedHousechmod 777 sharedHouse
 1605111434407
 1605111496364
-3.挂载硬盘1mount &amp;#x2F;dev&amp;#"/>
+3.挂载硬盘1mount /dev/sdb2 /"/>
 
 
 <!--Author-->
@@ -36,7 +36,7 @@
 2.新建要挂载的目录并赋权12mkdir sharedHousechmod 777 sharedHouse
 1605111434407
 1605111496364
-3.挂载硬盘1mount &amp;#x2F;dev&amp;#"/>
+3.挂载硬盘1mount /dev/sdb2 /"/>
 
 
 <!--Open Graph Site Name-->
@@ -164,39 +164,43 @@
     
 </span>  
                 
-                <h2 id="1-识别硬盘-得到硬盘地址"><a href="#1-识别硬盘-得到硬盘地址" class="headerlink" title="1.识别硬盘,得到硬盘地址"></a>1.识别硬盘,得到硬盘地址</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
+                <h2 id="1-识别硬盘-得到硬盘地址"><a href="#1-识别硬盘-得到硬盘地址" class="headerlink" title="1.识别硬盘,得到硬盘地址"></a>1.识别硬盘,得到硬盘地址</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
 
 <p><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111215480.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111215480.png" alt="1605111215480"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111215480</span></div></div></p>
-<h2 id="2-新建要挂载的目录并赋权"><a href="#2-新建要挂载的目录并赋权" class="headerlink" title="2.新建要挂载的目录并赋权"></a>2.新建要挂载的目录并赋权</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir sharedHouse</span><br><span class="line">chmod 777 sharedHouse</span><br></pre></td></tr></table></figure>
+<h2 id="2-新建要挂载的目录并赋权"><a href="#2-新建要挂载的目录并赋权" class="headerlink" title="2.新建要挂载的目录并赋权"></a>2.新建要挂载的目录并赋权</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir sharedHouse</span><br><span class="line">chmod 777 sharedHouse</span><br></pre></td></tr></table></figure>
 <p><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111434407.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111434407.png" alt="1605111434407"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111434407</span></div></div></p>
 <p><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111496364.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111496364.png" alt="1605111496364"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111496364</span></div></div></p>
-<h2 id="3-挂载硬盘"><a href="#3-挂载硬盘" class="headerlink" title="3.挂载硬盘"></a>3.挂载硬盘</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount &#x2F;dev&#x2F;sdb2 &#x2F;home&#x2F;pi&#x2F;sharedHouse</span><br></pre></td></tr></table></figure>
+<h2 id="3-挂载硬盘"><a href="#3-挂载硬盘" class="headerlink" title="3.挂载硬盘"></a>3.挂载硬盘</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount /dev/sdb2 /home/pi/sharedHouse</span><br></pre></td></tr></table></figure>
 
 <p><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111236191.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111236191.png" alt="1605111236191"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111236191</span></div></div></p>
-<h2 id="4-配置smb-conf"><a href="#4-配置smb-conf" class="headerlink" title="4.配置smb.conf"></a>4.配置smb.conf</h2><h2 id=""><a href="#" class="headerlink" title=""></a><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111371846.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111371846.png" alt="1605111371846"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111371846</span></div></div></h2><h2 id="5-重启samba服务"><a href="#5-重启samba服务" class="headerlink" title="5.重启samba服务"></a>5.重启samba服务</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service smbd restart</span><br></pre></td></tr></table></figure>
+<h2 id="4-配置smb-conf"><a href="#4-配置smb-conf" class="headerlink" title="4.配置smb.conf"></a>4.配置smb.conf</h2><h2 id=""><a href="#" class="headerlink" title=""></a><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111371846.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111371846.png" alt="1605111371846"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111371846</span></div></div></h2><h2 id="5-重启samba服务"><a href="#5-重启samba服务" class="headerlink" title="5.重启samba服务"></a>5.重启samba服务</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service smbd restart</span><br></pre></td></tr></table></figure>
 
 <h2 id="6-终端访问共享目录"><a href="#6-终端访问共享目录" class="headerlink" title="6.终端访问共享目录"></a>6.终端访问共享目录</h2><p><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111603085.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111603085.png" alt="1605111603085"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111603085</span></div></div></p>
 <h1 id="Extra"><a href="#Extra" class="headerlink" title="Extra"></a>Extra</h1><ul>
 <li>Q:上面的挂载只是临时的，系统重启后会失效，需要重新挂载，所以我们需要配置开机自动挂载</li>
 </ul>
-<h2 id="1-查看硬盘信息"><a href="#1-查看硬盘信息" class="headerlink" title="1.查看硬盘信息"></a>1.查看硬盘信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
+<h2 id="1-查看硬盘信息"><a href="#1-查看硬盘信息" class="headerlink" title="1.查看硬盘信息"></a>1.查看硬盘信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
 
 <p> <div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111987887.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605111987887.png" alt="1605111987887"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605111987887</span></div></div></p>
-<h2 id="2-配置自动挂载文件"><a href="#2-配置自动挂载文件" class="headerlink" title="2.配置自动挂载文件"></a>2.配置自动挂载文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi &#x2F;etc&#x2F;fstab</span><br></pre></td></tr></table></figure>
+<h2 id="2-配置自动挂载文件"><a href="#2-配置自动挂载文件" class="headerlink" title="2.配置自动挂载文件"></a>2.配置自动挂载文件</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/fstab</span><br></pre></td></tr></table></figure>
 
 <p><div class="img-item" data-src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605112219449.png" data-sub-html=".caption"><img src="../image/%E6%8C%82%E8%BD%BD%E7%A1%AC%E7%9B%98/1605112219449.png" alt="1605112219449"><div class="img-caption d-block text-center"><span class="center-caption text-muted border-bottom">1605112219449</span></div></div></p>
 <p>  修改文件内容</p>
-<p>UUID=6EAA2D29AA2CEF71 /home/pi/sharedHouse ntfs default 0 0</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;fs spec&gt; &lt;fs file&gt; &lt;fs vfstype&gt; &lt;fs mntops&gt; &lt;fs freq&gt; &lt;fs passno&gt;</span><br><span class="line"> 具体说明，以挂载&#x2F;dev&#x2F;sdb1为例：</span><br><span class="line"> &lt;fs spec&gt;：分区定位，可以给UUID或LABEL，例如：UUID&#x3D;6E9ADAC29ADA85CD或LABEL&#x3D;software</span><br><span class="line"> &lt;fs file&gt;：具体挂载点的位置，例如：&#x2F;data</span><br><span class="line"> &lt;fs vfstype&gt;：挂载磁盘类型，linux分区一般为ext4，windows分区一般为ntfs</span><br><span class="line"> &lt;fs mntops&gt;：挂载参数，一般为defaults</span><br><span class="line"> &lt;fs freq&gt;：磁盘检查，默认为0</span><br><span class="line"> &lt;fs passno&gt;：磁盘检查，默认为0，不需要检查</span><br></pre></td></tr></table></figure>
+<p>UUID=6EAA2D29AA2CEF71 /home/pi/sharedHouse ntfs nofail 0 0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;fs spec&gt; &lt;fs file&gt; &lt;fs vfstype&gt; &lt;fs mntops&gt; &lt;fs freq&gt; &lt;fs passno&gt;</span><br><span class="line"> 具体说明，以挂载&#x2F;dev&#x2F;sdb1为例：</span><br><span class="line"> &lt;fs spec&gt;：分区定位，可以给UUID或LABEL，例如：UUID&#x3D;6E9ADAC29ADA85CD或LABEL&#x3D;software</span><br><span class="line"> &lt;fs file&gt;：具体挂载点的位置，例如：&#x2F;data</span><br><span class="line"> &lt;fs vfstype&gt;：挂载磁盘类型，linux分区一般为ext4，windows分区一般为ntfs</span><br><span class="line"> &lt;fs mntops&gt;：挂载参数，一般为defaults nofail代表挂载失败不影响启动</span><br><span class="line"> &lt;fs freq&gt;：磁盘检查，默认为0</span><br><span class="line"> &lt;fs passno&gt;：磁盘检查，默认为0，不需要检查</span><br></pre></td></tr></table></figure>
+
+<p>需要注意这里我用来挂载外置硬盘，有可能硬盘不在，所以挂载选项要用nofail来防止没插硬盘系统起不起来的问题</p>
+<p>详情可以见文档fstab(5)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">man 5 fstab</span><br></pre></td></tr></table></figure>
 
 
 
 <h2 id="3-校验配置文件"><a href="#3-校验配置文件" class="headerlink" title="3.校验配置文件"></a>3.校验配置文件</h2><p>修改完/etc/fstab文件后，运行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -a</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -a</span><br></pre></td></tr></table></figure>
 
 <p>校验配置的正确性，不正确可能导致系统无法启动(PS:如果挂了也可以通过安全模式进入系统修改/etc/fstab这个配置文件来让系统正常启动)</p>
 <p>参考:</p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/336758411dbf">Linux配置硬盘自动挂载</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/336758411dbf">Linux配置硬盘自动挂载</a><br><a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/53456/what-is-the-difference-between-nobootwait-and-nofail-in-fstab">What is the difference between ‘nobootwait’ and ‘nofail’ in fstab?</a></p>
 
             </div>
 
