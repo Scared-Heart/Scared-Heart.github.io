@@ -10,10 +10,14 @@
 
 
     <meta name="description" content="现象梯子不能上外网
-debug过程首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定http://tool.chinaz.com/port/
-http://ping.chinaz.com/
-测试结果都是好的这就很奇怪了，发生什么事了？ 看日志ssh上到搬瓦工，
-1"/>
+debug过程首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定
+
+端口扫描https://tool.chinaz.com/port/
+
+ping iphttps://ping.chinaz.com/
+
+
+测试结果都是好的这就很奇怪了，发生什么"/>
 
 
 <!--Author-->
@@ -29,10 +33,14 @@ http://ping.chinaz.com/
 <!--Open Graph Description-->
 
     <meta property="og:description" content="现象梯子不能上外网
-debug过程首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定http://tool.chinaz.com/port/
-http://ping.chinaz.com/
-测试结果都是好的这就很奇怪了，发生什么事了？ 看日志ssh上到搬瓦工，
-1"/>
+debug过程首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定
+
+端口扫描https://tool.chinaz.com/port/
+
+ping iphttps://ping.chinaz.com/
+
+
+测试结果都是好的这就很奇怪了，发生什么"/>
 
 
 <!--Open Graph Site Name-->
@@ -161,18 +169,29 @@ http://ping.chinaz.com/
 </span>  
                 
                 <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>梯子不能上外网</p>
-<h2 id="debug过程"><a href="#debug过程" class="headerlink" title="debug过程"></a>debug过程</h2><p>首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定<br><a target="_blank" rel="noopener" href="http://tool.chinaz.com/port/">http://tool.chinaz.com/port/</a></p>
-<p><a target="_blank" rel="noopener" href="http://ping.chinaz.com/">http://ping.chinaz.com/</a></p>
+<h2 id="debug过程"><a href="#debug过程" class="headerlink" title="debug过程"></a>debug过程</h2><p>首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定</p>
+<ul>
+<li><p>端口扫描<br><a target="_blank" rel="noopener" href="https://tool.chinaz.com/port/">https://tool.chinaz.com/port/</a></p>
+</li>
+<li><p>ping ip<br><a target="_blank" rel="noopener" href="https://ping.chinaz.com/">https://ping.chinaz.com/</a></p>
+</li>
+</ul>
 <p>测试结果都是好的<br>这就很奇怪了，发生什么事了？ 看日志<br>ssh上到搬瓦工，</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service trojan status</span><br></pre></td></tr></table></figure>
 <p>查看服务状态，显示</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trojan SSL handshake failed: sslv3 alert bad certificate</span><br></pre></td></tr></table></figure>
 <p>看起来像是ssl证书出了问题，用浏览器访问伪装的域名也显示不安全，而不是小绿锁<br>奇怪，我的证书是acme.sh脚本申请的，应该没问题吧。<br>那查查证书啥问题吧，到证书文件路径下，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ls -al</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line"></span><br><span class="line">证书的创建时间是6月，现在是9月，会不会是证书过期了？</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>cat domain.cert | openssl x509 -noout -enddate</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">输出:</span><br></pre></td></tr></table></figure>
-<p>notAfter=Dec 24 23:59:59 2021 GMT</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">靠，刚好就是昨天过期的，看来原因找到了，ssl证书过期导致ssl握手失败。</span><br><span class="line">这时候咋办？</span><br><span class="line">1.客户端不对证书进行校验，直接连接，梯子正常工作，就是可能不太安全。（配置文件里</span><br><span class="line">2.更新证书，让ssl正常握手</span><br><span class="line">我选择后者。</span><br><span class="line"></span><br><span class="line">到服务器目录下，</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line">acme.sh --renew www.example.com --debug</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -al</span><br></pre></td></tr></table></figure>
+
+
+<p>发现证书的创建时间是6月，现在是9月，会不会是证书过期了？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat domain.cert | openssl x509 -noout -enddate</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 输出</span><br><span class="line">notAfter&#x3D;Dec 24 23:59:59 2021 GMT</span><br></pre></td></tr></table></figure>
+
+<p>靠，刚好就是昨天过期的，看来原因找到了，ssl证书过期导致ssl握手失败。<br>这时候咋办？<br>1.客户端不对证书进行校验，直接连接，梯子正常工作，就是可能不太安全。（配置文件里<br>2.更新证书，让ssl正常握手<br>我选择后者。</p>
+<p>到服务器目录下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acme.sh --renew www.example.com --debug</span><br></pre></td></tr></table></figure>
 <p>尝试更新证书，发现失败了，原因是80端口被占用。</p>
 <p>我靠，破案了，我这台服务器上有运行nginx在80端口，而当初acme申请证书的时候选择是standalone模式，</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acme.sh  --issue -d mydomain.com   --standalone</span><br></pre></td></tr></table></figure>
