@@ -168,7 +168,7 @@ http://ping.chinaz.com/
 <p>查看服务状态，显示</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trojan SSL handshake failed: sslv3 alert bad certificate</span><br></pre></td></tr></table></figure>
 <p>看起来像是ssl证书出了问题，用浏览器访问伪装的域名也显示不安全，而不是小绿锁<br>奇怪，我的证书是acme.sh脚本申请的，应该没问题吧。<br>那查查证书啥问题吧，到证书文件路径下，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -al</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line">证书的创建时间是6月，现在是9月，会不会是证书过期了？</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ls -al</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line"></span><br><span class="line">证书的创建时间是6月，现在是9月，会不会是证书过期了？</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <p>cat domain.cert | openssl x509 -noout -enddate</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">输出:</span><br></pre></td></tr></table></figure>
 <p>notAfter=Dec 24 23:59:59 2021 GMT</p>
