@@ -9,7 +9,11 @@
 
 
 
-    <meta name="description" content="今天是平凡的一天,上班打卡下班打卡."/>
+    <meta name="description" content="现象梯子不能上外网
+debug过程首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定http://tool.chinaz.com/port/
+http://ping.chinaz.com/
+测试结果都是好的这就很奇怪了，发生什么事了？ 看日志ssh上到搬瓦工，
+1"/>
 
 
 <!--Author-->
@@ -19,12 +23,16 @@
 
 <!--Open Graph Title-->
 
-    <meta property="og:title" content="平凡的一天"/>
+    <meta property="og:title" content="修复服务器ssl证书过期"/>
 
 
 <!--Open Graph Description-->
 
-    <meta property="og:description" content="今天是平凡的一天,上班打卡下班打卡."/>
+    <meta property="og:description" content="现象梯子不能上外网
+debug过程首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定http://tool.chinaz.com/port/
+http://ping.chinaz.com/
+测试结果都是好的这就很奇怪了，发生什么事了？ 看日志ssh上到搬瓦工，
+1"/>
 
 
 <!--Open Graph Site Name-->
@@ -51,7 +59,7 @@
 
 <!-- Title -->
 
-<title>平凡的一天 | apple pie</title>
+<title>修复服务器ssl证书过期 | apple pie</title>
 
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
@@ -120,7 +128,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 text-center">
                 <div class="post-heading text-white">
-                    <h1>平凡的一天</h1>
+                    <h1>修复服务器ssl证书过期</h1>
                     
                 </div>
             </div>
@@ -137,18 +145,12 @@
                 
                     <span class="meta d-inline-block">
     
-        <i class="far fa-bookmark fa-fw"></i>
-        
-
-<a href="/categories/%E9%97%B2%E8%AF%9D/">闲话</a>
-
-    
     
     <!-- Date -->
     
         <span class="post-meta-split">&nbsp;|&nbsp;</span>
         <i class="far fa-calendar-check fa-fw"></i>
-        2019-07-24
+        2021-10-12
     
     <!-- word count and read count -->
     
@@ -158,7 +160,24 @@
     
 </span>  
                 
-                <p>今天是平凡的一天,上班打卡下班打卡.</p>
+                <h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>梯子不能上外网</p>
+<h2 id="debug过程"><a href="#debug过程" class="headerlink" title="debug过程"></a>debug过程</h2><p>首先怀疑是不是域名被墙，443端口被封，这两点通过站长之家的端口扫描和ping可以确定<br><a target="_blank" rel="noopener" href="http://tool.chinaz.com/port/">http://tool.chinaz.com/port/</a></p>
+<p><a target="_blank" rel="noopener" href="http://ping.chinaz.com/">http://ping.chinaz.com/</a></p>
+<p>测试结果都是好的<br>这就很奇怪了，发生什么事了？ 看日志<br>ssh上到搬瓦工，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service trojan status</span><br></pre></td></tr></table></figure>
+<p>查看服务状态，显示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trojan SSL handshake failed: sslv3 alert bad certificate</span><br></pre></td></tr></table></figure>
+<p>看起来像是ssl证书出了问题，用浏览器访问伪装的域名也显示不安全，而不是小绿锁<br>奇怪，我的证书是acme.sh脚本申请的，应该没问题吧。<br>那查查证书啥问题吧，到证书文件路径下，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -al</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line">证书的创建时间是6月，现在是9月，会不会是证书过期了？</span><br></pre></td></tr></table></figure>
+<p>cat domain.cert | openssl x509 -noout -enddate</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">输出:</span><br></pre></td></tr></table></figure>
+<p>notAfter=Dec 24 23:59:59 2021 GMT</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">靠，刚好就是昨天过期的，看来原因找到了，ssl证书过期导致ssl握手失败。</span><br><span class="line">这时候咋办？</span><br><span class="line">1.客户端不对证书进行校验，直接连接，梯子正常工作，就是可能不太安全。（配置文件里</span><br><span class="line">2.更新证书，让ssl正常握手</span><br><span class="line">我选择后者。</span><br><span class="line"></span><br><span class="line">到服务器目录下，</span><br><span class="line">&#96;&#96;&#96; </span><br><span class="line">acme.sh --renew www.example.com --debug</span><br></pre></td></tr></table></figure>
+<p>尝试更新证书，发现失败了，原因是80端口被占用。</p>
+<p>我靠，破案了，我这台服务器上有运行nginx在80端口，而当初acme申请证书的时候选择是standalone模式，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acme.sh  --issue -d mydomain.com   --standalone</span><br></pre></td></tr></table></figure>
+<p>即本地在80端口开启一个http服务进行验证申请证书。<br>而每次ctron脚本要去更新证书时，都会在80端口开启服务，结果因为80被nginx占了，所以自然开启失败，导致更新证书失败。</p>
+<p>咋办？ trojan的伪装要，还要自动更新证书。<br>哎，把nginx的端口改成了8080，trojan的fallback方案改为监听8080，那么80端口不久不被占用了？ 这样申请证书脚本顺利跑，脚本能正常更新，trojan还能伪装，两全其美。</p>
 
             </div>
 
@@ -168,8 +187,8 @@
     <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
         <ul class="pagination d-block text-center">
             
-                <li class="previous page-item d-inline"><a href="/V2ray%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%95%99%E7%A8%8B(WSS)/" class="page-link float-left">&larr;  下一页</a></li>
             
+                <li class="next page-item d-inline"><a href="/%E6%A0%91%E8%8E%93%E6%B4%BE%E8%87%AA%E5%8A%A8%E6%8C%82%E8%BD%BD%E6%96%B0%E7%A1%AC%E7%9B%98/" class="page-link float-right">上一页  &rarr;</a></li>
             
         </ul>
     </div>
