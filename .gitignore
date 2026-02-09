@@ -1,2 +1,5 @@
 node_modules/
-package-lock.json
+public/
+db.json
+.deploy_git/
+*.log

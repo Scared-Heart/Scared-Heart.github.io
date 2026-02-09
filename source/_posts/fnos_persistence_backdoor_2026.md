@@ -1,4 +1,17 @@
-# 记一次飞牛fnOS持久化后门事件：系统更新被阻断的幕后黑手
+---
+title: "记一次飞牛fnOS持久化后门事件：系统更新被阻断的幕后黑手"
+date: 2026-02-08
+description: "清理完内核级Rootkit后，我发现系统更新一直卡在转圈。深入排查后发现了另一个后门——攻击者修改了启动脚本，用immutable锁定关键文件，彻底阻止系统更新。"
+categories:
+  - 安全事件
+tags:
+  - fnOS
+  - 飞牛NAS
+  - 持久化机制
+  - immutable
+  - 系统更新阻断
+  - Claude Code
+---
 
 > 清理完内核级Rootkit后，我发现系统更新一直卡在转圈。深入排查后发现了另一个后门——攻击者修改了启动脚本，用immutable锁定关键文件，彻底阻止系统更新。
 
@@ -13,7 +26,7 @@
 
 ### 1.1 异常现象
 
-清理完内核级Rootkit后（详见[上篇文章](./blog_fnos_rootkit_incident_2026.md)），我尝试通过Web管理界面更新系统。
+清理完内核级Rootkit后（详见[上篇文章](/fnos_rootkit_incident_2026/)），我尝试通过Web管理界面更新系统。
 
 **更新界面一直卡在转圈，永远不会完成。**
 
@@ -574,13 +587,3 @@ iptables -A OUTPUT -d 43.198.11.122 -j DROP
 
 如果你也是fnOS用户，建议运行本文提供的检测脚本，确保系统没有被植入类似的后门。
 
----
-
-**文章信息**
-- 作者：breeze
-- 日期：2026-02-08
-- 分类：安全事件、NAS、持久化后门
-- 标签：fnOS, 飞牛NAS, 持久化机制, immutable, 系统更新阻断, Claude Code
-
-**相关文章**
-- [记一次飞牛fnOS内核级Rootkit入侵事件](./blog_fnos_rootkit_incident_2026.md)
