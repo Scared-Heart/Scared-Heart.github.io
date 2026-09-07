@@ -7,8 +7,6 @@ const posts = await getPosts();
 
 <Base title="文章归档"
   ><header class="page-heading">
-    <p class="eyebrow">THROUGH THE YEARS</p><h1>时间里的记录</h1><p>
-      从 2019 年开始，一共留下了 {posts.length} 篇文章。
-    </p>
+    <h1>归档</h1><p>共 {posts.length} 篇文章</p>
   </header><div class="page-content"><ArchiveList posts={posts} /></div></Base
 >

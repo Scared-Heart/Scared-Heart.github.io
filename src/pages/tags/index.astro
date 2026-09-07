@@ -7,8 +7,6 @@ const tags = groups(await getPosts(), 'tags');
 
 <Base title="文章标签"
   ><header class="page-heading">
-    <p class="eyebrow">FOLLOW A THREAD</p><h1>顺着线索，继续探索</h1><p>
-      用一个关键词，找到相关的记录。
-    </p>
+    <h1>标签</h1>
   </header><div class="page-content"><TaxonomyIndex groups={tags} kind="tags" /></div></Base
 >
