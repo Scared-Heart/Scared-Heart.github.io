@@ -1,169 +1,117 @@
 ---
 import Base from '../layouts/Base.astro';
-import PostCard from '../components/PostCard.astro';
-import Icon from '../components/Icon.astro';
-import { getPosts, groups, taxonomyUrl } from '../lib/posts';
+import { getPosts, formatDate, postUrl } from '../lib/posts';
 const posts = await getPosts();
-const categories = groups(posts, 'categories');
 ---
 
 <Base>
-  <header class="poster">
+  <header class="original-cover">
     <img
-      class="poster-image"
       src="/img/banner-poster.webp"
       alt="橙色荒野中独自行走的身影"
       width="2400"
       height="1000"
       fetchpriority="high"
     />
-    <div class="poster-content">
-      <h1>apple pie<span>.</span></h1>
-      <div class="poster-bottom"><span>Breeze Chan</span><a href="#latest">文章 ↓</a></div>
-    </div>
+    <div class="cover-title"><h1>apple pie</h1><hr /></div>
   </header>
-  <section id="latest" class="latest-section" aria-labelledby="latest-heading">
-    <div class="section-heading">
-      <div>
-        <h2 id="latest-heading">
-          最新文章<span class="count">{posts.length}</span>
-        </h2>
-      </div><a class="text-link subtle" href="/archives/"
-        >按时间翻阅 <Icon name="arrow" size={17} /></a
-      >
-    </div>
-    <div class="topic-links">
-      <span class="topic-active">全部文章</span>{
-        categories.map(([name, list]) => (
-          <a href={taxonomyUrl('categories', name)}>
-            {name}
-            <span>{list.length}</span>
-          </a>
-        ))
-      }
-    </div>
-    <div class="home-list">
-      {posts.map((post) => <PostCard post={post} />)}
-    </div>
+  <section id="latest" class="original-list" aria-label="文章">
+    {
+      posts.map((post) => (
+        <article>
+          <h2>
+            <a href={postUrl(post.id)}>{post.data.title}</a>
+          </h2>
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        </article>
+      ))
+    }
   </section>
 </Base>
 
 <style>
-  .poster {
+  .original-cover {
     position: relative;
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    height: 86svh;
-    min-height: 560px;
-    max-height: 1100px;
-    color: #fff;
-    background: #a55208;
+    height: 430px;
+    display: grid;
+    place-items: center;
     isolation: isolate;
+    color: white;
+    background: #a56518;
   }
-  .poster-image {
+  .original-cover img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 50%;
+    object-position: center;
     z-index: -2;
   }
-  .poster::after {
+  .original-cover::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, #20130755, transparent 28%, transparent 48%, #20130788);
+    background: rgba(33, 33, 33, 0.15);
     z-index: -1;
   }
-  .poster-content {
-    position: absolute;
-    bottom: 40px;
-    left: 6%;
-    right: 6%;
+  .cover-title {
+    text-align: center;
+    transform: translateY(-5px);
   }
-  .poster h1 {
-    font:
-      500 clamp(86px, 13vw, 210px)/1 Georgia,
-      serif;
-    letter-spacing: -0.065em;
-    margin: 0 0 32px;
+  .cover-title h1 {
+    margin: 0;
+    font: 800 80px/1.2 var(--heading);
+    letter-spacing: normal;
   }
-  .poster h1 span {
-    color: #f5c679;
-  }
-  .poster-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid #ffffff66;
-    padding-top: 18px;
-    font-size: 13px;
-    letter-spacing: 0.08em;
-  }
-  .poster-bottom a {
-    padding: 4px 0 4px 20px;
-  }
-  .latest-section {
-    padding-top: 64px;
-  }
-  .section-heading {
-    margin-bottom: 18px;
-  }
-  .section-heading h2 {
-    font-family: var(--body);
-    font-size: 19px;
-  }
-  .topic-links {
-    margin-bottom: 0;
-  }
-  .home-list {
-    padding-bottom: 42px;
-  }
-  .home-list :global(.post-card) {
-    padding: 23px 0;
+  .cover-title hr {
+    width: 100px;
+    margin: 15px auto 0;
     border: 0;
+    border-top: 4px solid white;
+  }
+  .original-list {
+    max-width: 730px;
+    margin: 50px auto 70px;
+  }
+  .original-list article {
+    padding: 26px 0 30px;
     border-bottom: 1px solid var(--line);
-    border-radius: 0;
-    background: transparent;
-    transform: none;
   }
-  .home-list :global(.post-card-meta) {
-    justify-content: flex-start;
-    gap: 16px;
+  .original-list article:last-child {
+    border-bottom: 0;
   }
-  .home-list :global(.post-card h3) {
-    margin: 9px 0 7px;
-    font-size: 19px;
+  .original-list h2 {
+    font: 800 36px/1.25 var(--heading);
+    margin: 0 0 12px;
+    color: var(--ink);
   }
-  .home-list :global(.post-card > p) {
-    margin-bottom: 10px;
-    -webkit-line-clamp: 2;
-    max-width: 850px;
+  .original-list a:hover {
+    color: var(--accent);
   }
-  .home-list :global(.post-card-bottom) {
-    padding: 0;
-    border: 0;
+  .original-list time {
+    color: var(--muted);
+    font:
+      18px/1.5 Georgia,
+      serif;
   }
-  @media (max-width: 600px) {
-    .poster {
-      height: 80svh;
-      min-height: 520px;
+  @media (max-width: 768px) {
+    .original-cover {
+      height: 270px;
     }
-    .poster-content {
-      left: 24px;
-      right: 24px;
-      bottom: 28px;
+    .cover-title {
+      padding-top: 35px;
     }
-    .poster h1 {
-      font-size: clamp(76px, 20vw, 120px);
-      margin-bottom: 28px;
+    .cover-title h1 {
+      font-size: 50px;
     }
-    .latest-section {
-      padding-top: 36px;
+    .original-list {
+      margin-top: 25px;
     }
-    .home-list :global(.post-card h3) {
-      font-size: 17px;
+    .original-list h2 {
+      font-size: 28px;
     }
   }
 </style>

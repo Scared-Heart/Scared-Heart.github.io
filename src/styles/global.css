@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
-  --bg: #fafaf9;
+  --bg: #fff;
   --surface: #fff;
-  --ink: #252421;
+  --ink: #333;
   --text: #42413e;
   --muted: #74716b;
   --accent: #af4b29;
@@ -12,7 +12,8 @@
   --code: #f0efec;
   --shadow: 0 20px 65px #25242108;
   --body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --display: Georgia, 'Songti SC', 'STSong', serif;
+  --heading: 'Open Sans', 'Noto Sans TC', 'Helvetica Neue', Arial, sans-serif;
+  --display: var(--heading);
   --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 :root[data-theme='dark'] {
@@ -635,35 +636,31 @@ img {
   }
 }
 
-/* The original cover fills the home masthead; navigation stays on the image. */
+/* Preserve the original Clean masthead proportions and minimal navigation. */
 .poster-home .site-header {
   position: absolute;
   inset: 0 0 auto;
+  height: 56px;
+  min-height: 56px;
   width: 100%;
-  max-width: none;
-  padding-inline: 6%;
+  max-width: 1160px;
+  padding: 0 24px;
   z-index: 2;
   border: 0;
+  flex-wrap: nowrap;
 }
 .poster-home .brand {
-  font: 500 17px/1 var(--body);
+  font: 800 20px/1.2 var(--heading);
   letter-spacing: 0;
 }
-.poster-home .brand-symbol,
-.poster-home .brand-dot {
-  display: none;
-}
 .poster-home .site-header .brand,
-.poster-home .site-header nav a,
 .poster-home .site-header .icon-button {
   color: #fff;
 }
-.poster-home .site-header nav a[aria-current]::after {
-  background: #fff;
-  height: 1px;
-}
 .poster-home .header-tools {
-  border-color: #ffffff55;
+  margin-left: auto;
+  border: 0;
+  padding: 0;
 }
 .poster-home .icon-button:hover {
   background: #ffffff22;
@@ -671,8 +668,6 @@ img {
 .poster-home .site-header :focus-visible {
   outline-color: #fff;
 }
-@media (max-width: 600px) {
-  .poster-home .site-header {
-    padding-inline: 24px;
-  }
+.footer-links {
+  flex-wrap: wrap;
 }

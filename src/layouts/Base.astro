@@ -35,6 +35,10 @@ const navigation = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@800&family=Noto+Sans+TC:wght@900&display=swap"
+    />
     <meta name="description" content={description} />
     <meta name="author" content={site.author} />
     <meta name="theme-color" content="#f7f9f6" />
@@ -70,24 +74,24 @@ const navigation = [
     <a class="skip-link" href="#main">跳到正文</a>
     <header class="site-header shell">
       <a class="brand" href="/" aria-label="apple pie 首页"
-        ><span class="brand-symbol"><Icon name="pie" size={24} /></span><span
-          >apple pie<span class="brand-dot">.</span></span
-        ></a
+        >{path === '/' ? 'Breeze Chan' : 'apple pie'}</a
       >
-      <nav aria-label="主导航">
-        {
-          navigation.map(({ label, href }) => (
-            <a
-              href={href}
-              aria-current={
-                (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined
-              }
-            >
-              {label}
-            </a>
-          ))
-        }
-      </nav>
+      {
+        path !== '/' && (
+          <nav aria-label="主导航">
+            {navigation.map(({ label, href }) => (
+              <a
+                href={href}
+                aria-current={
+                  (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined
+                }
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        )
+      }
       <div class="header-tools">
         <a class="icon-button" href="/search/" aria-label="搜索文章"><Icon name="search" /></a>
         <button class="icon-button theme-toggle" aria-label="切换深浅色" type="button"
@@ -102,6 +106,7 @@ const navigation = [
       <div><a class="footer-brand" href="/">apple pie.</a></div>
       <div class="footer-right">
         <div class="footer-links">
+          <a href="/archives/">归档</a><a href="/categories/">分类</a><a href="/about/">关于</a>
           <a href={site.github} aria-label="Breeze Chan 的 GitHub"
             ><Icon name="github" size={18} />GitHub</a
           ><a href="/rss.xml"><Icon name="rss" size={18} />RSS</a><a href="/tags/">标签</a>
