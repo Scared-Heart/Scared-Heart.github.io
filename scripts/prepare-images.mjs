@@ -12,3 +12,13 @@ if (!generated || generated.mtimeMs < original.mtimeMs) {
     .webp({ quality: 78 })
     .toFile(fileURLToPath(output));
 }
+
+const poster = new URL('../static/img/banner-poster.webp', import.meta.url);
+const posterStat = await stat(poster).catch(() => null);
+if (!posterStat || posterStat.mtimeMs < original.mtimeMs) {
+  await sharp(await readFile(input))
+    .rotate()
+    .resize({ width: 2400, withoutEnlargement: true })
+    .webp({ quality: 85 })
+    .toFile(fileURLToPath(poster));
+}

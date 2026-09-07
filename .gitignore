@@ -10,3 +10,4 @@ db.json
 .env.*
 !.env.example
 static/img/banner-preview.webp
+static/img/banner-poster.webp

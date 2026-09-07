@@ -8,9 +8,19 @@ const categories = groups(posts, 'categories');
 ---
 
 <Base>
-  <header class="home-intro">
-    <h1>Breeze 的博客</h1>
-    <p>记录技术探索、问题排查和日常生活。</p>
+  <header class="poster">
+    <img
+      class="poster-image"
+      src="/img/banner-poster.webp"
+      alt="橙色荒野中独自行走的身影"
+      width="2400"
+      height="1000"
+      fetchpriority="high"
+    />
+    <div class="poster-content">
+      <h1>apple pie<span>.</span></h1>
+      <div class="poster-bottom"><span>Breeze Chan</span><a href="#latest">文章 ↓</a></div>
+    </div>
   </header>
   <section id="latest" class="latest-section" aria-labelledby="latest-heading">
     <div class="section-heading">
@@ -39,23 +49,63 @@ const categories = groups(posts, 'categories');
 </Base>
 
 <style>
-  .home-intro {
-    padding: 32px 0 28px;
+  .poster {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: 86svh;
+    min-height: 560px;
+    max-height: 1100px;
+    color: #fff;
+    background: #a55208;
+    isolation: isolate;
   }
-  .home-intro h1 {
-    margin: 0 0 8px;
-    font-size: 27px;
-    line-height: 1.4;
-    font-weight: 600;
-    color: var(--ink);
+  .poster-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+    z-index: -2;
   }
-  .home-intro p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--muted);
+  .poster::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #20130755, transparent 28%, transparent 48%, #20130788);
+    z-index: -1;
+  }
+  .poster-content {
+    position: absolute;
+    bottom: 40px;
+    left: 6%;
+    right: 6%;
+  }
+  .poster h1 {
+    font:
+      500 clamp(86px, 13vw, 210px)/1 Georgia,
+      serif;
+    letter-spacing: -0.065em;
+    margin: 0 0 32px;
+  }
+  .poster h1 span {
+    color: #f5c679;
+  }
+  .poster-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #ffffff66;
+    padding-top: 18px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+  }
+  .poster-bottom a {
+    padding: 4px 0 4px 20px;
   }
   .latest-section {
-    padding-top: 24px;
+    padding-top: 64px;
   }
   .section-heading {
     margin-bottom: 18px;
@@ -96,11 +146,21 @@ const categories = groups(posts, 'categories');
     border: 0;
   }
   @media (max-width: 600px) {
-    .home-intro {
-      padding: 24px 0;
+    .poster {
+      height: 80svh;
+      min-height: 520px;
     }
-    .home-intro h1 {
-      font-size: 23px;
+    .poster-content {
+      left: 24px;
+      right: 24px;
+      bottom: 28px;
+    }
+    .poster h1 {
+      font-size: clamp(76px, 20vw, 120px);
+      margin-bottom: 28px;
+    }
+    .latest-section {
+      padding-top: 36px;
     }
     .home-list :global(.post-card h3) {
       font-size: 17px;

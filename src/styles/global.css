@@ -1,32 +1,32 @@
 :root {
   color-scheme: light;
-  --bg: #f7f9f6;
+  --bg: #fafaf9;
   --surface: #fff;
-  --ink: #253d35;
-  --text: #39443f;
-  --muted: #69766f;
+  --ink: #252421;
+  --text: #42413e;
+  --muted: #74716b;
   --accent: #af4b29;
   --accent-bg: #faeee6;
-  --line: #dde4dd;
-  --soft: #edf2eb;
-  --code: #eef2ed;
-  --shadow: 0 20px 65px #253d3508;
+  --line: #e3e1dc;
+  --soft: #f0efec;
+  --code: #f0efec;
+  --shadow: 0 20px 65px #25242108;
   --body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --display: Georgia, 'Songti SC', 'STSong', serif;
   --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #17221e;
-  --surface: #1d2c25;
-  --ink: #e1e9df;
-  --text: #c9d4ca;
-  --muted: #a0afa4;
+  --bg: #191918;
+  --surface: #222220;
+  --ink: #eeeae3;
+  --text: #d4d1ca;
+  --muted: #aaa79f;
   --accent: #f0a17e;
   --accent-bg: #3b2d25;
-  --line: #35463b;
-  --soft: #24332b;
-  --code: #26372c;
+  --line: #3c3b36;
+  --soft: #2b2b27;
+  --code: #2b2b27;
   --shadow: none;
 }
 * {
@@ -66,7 +66,7 @@ img {
 }
 ::selection {
   background: #eac5a8;
-  color: #253d35;
+  color: #252421;
 }
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -632,5 +632,47 @@ img {
   *:after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* The original cover fills the home masthead; navigation stays on the image. */
+.poster-home .site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  padding-inline: 6%;
+  z-index: 2;
+  border: 0;
+}
+.poster-home .brand {
+  font: 500 17px/1 var(--body);
+  letter-spacing: 0;
+}
+.poster-home .brand-symbol,
+.poster-home .brand-dot {
+  display: none;
+}
+.poster-home .site-header .brand,
+.poster-home .site-header nav a,
+.poster-home .site-header .icon-button {
+  color: #fff;
+}
+.poster-home .site-header nav a[aria-current]::after {
+  background: #fff;
+  height: 1px;
+}
+.poster-home .header-tools {
+  border-color: #ffffff55;
+}
+.poster-home .icon-button:hover {
+  background: #ffffff22;
+}
+.poster-home .site-header :focus-visible {
+  outline-color: #fff;
+}
+@media (max-width: 600px) {
+  .poster-home .site-header {
+    padding-inline: 24px;
   }
 }
