@@ -1,0 +1,25 @@
+---
+import { excerpt, formatDate, postUrl, readingMinutes, type Post } from '../lib/posts';
+import Icon from './Icon.astro';
+interface Props {
+  post: Post;
+  featured?: boolean;
+}
+const { post, featured = false } = Astro.props;
+---
+
+<article class:list={['post-card', { featured }]}>
+  <div class="post-card-meta">
+    <span class="category-label">{post.data.categories[0] || '技术笔记'}</span><time
+      datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time
+    >
+  </div>
+  <h3><a href={postUrl(post.id)}>{post.data.title}</a></h3>
+  <p>{excerpt(post)}</p>
+  <div class="post-card-bottom">
+    <span>{readingMinutes(post.body)} 分钟阅读</span><a
+      href={postUrl(post.id)}
+      aria-label={`阅读全文：${post.data.title}`}>阅读全文 <Icon name="arrow" size={17} /></a
+    >
+  </div>
+</article>

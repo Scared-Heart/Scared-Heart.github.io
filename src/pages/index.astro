@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import Icon from '../components/Icon.astro';
+import { getPosts, groups, taxonomyUrl } from '../lib/posts';
+const posts = await getPosts();
+const categories = groups(posts, 'categories');
+---
+
+<Base>
+  <header class="home-intro">
+    <h1>Breeze 的博客</h1>
+    <p>记录技术探索、问题排查和日常生活。</p>
+  </header>
+  <section id="latest" class="latest-section" aria-labelledby="latest-heading">
+    <div class="section-heading">
+      <div>
+        <h2 id="latest-heading">
+          最新文章<span class="count">{posts.length}</span>
+        </h2>
+      </div><a class="text-link subtle" href="/archives/"
+        >按时间翻阅 <Icon name="arrow" size={17} /></a
+      >
+    </div>
+    <div class="topic-links">
+      <span class="topic-active">全部文章</span>{
+        categories.map(([name, list]) => (
+          <a href={taxonomyUrl('categories', name)}>
+            {name}
+            <span>{list.length}</span>
+          </a>
+        ))
+      }
+    </div>
+    <div class="home-list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .home-intro {
+    padding: 32px 0 28px;
+  }
+  .home-intro h1 {
+    margin: 0 0 8px;
+    font-size: 27px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .home-intro p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .latest-section {
+    padding-top: 24px;
+  }
+  .section-heading {
+    margin-bottom: 18px;
+  }
+  .section-heading h2 {
+    font-family: var(--body);
+    font-size: 19px;
+  }
+  .topic-links {
+    margin-bottom: 0;
+  }
+  .home-list {
+    padding-bottom: 42px;
+  }
+  .home-list :global(.post-card) {
+    padding: 23px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    transform: none;
+  }
+  .home-list :global(.post-card-meta) {
+    justify-content: flex-start;
+    gap: 16px;
+  }
+  .home-list :global(.post-card h3) {
+    margin: 9px 0 7px;
+    font-size: 19px;
+  }
+  .home-list :global(.post-card > p) {
+    margin-bottom: 10px;
+    -webkit-line-clamp: 2;
+    max-width: 850px;
+  }
+  .home-list :global(.post-card-bottom) {
+    padding: 0;
+    border: 0;
+  }
+  @media (max-width: 600px) {
+    .home-intro {
+      padding: 24px 0;
+    }
+    .home-intro h1 {
+      font-size: 23px;
+    }
+    .home-list :global(.post-card h3) {
+      font-size: 17px;
+    }
+  }
+</style>

@@ -1,0 +1,110 @@
+---
+import { giscus } from '../config';
+interface Props {
+  term: string;
+}
+const { term } = Astro.props;
+---
+
+<section
+  id="comments"
+  class="comments-section"
+  aria-labelledby="comments-title"
+  data-giscus-repo={giscus.repo}
+  data-giscus-repo-id={giscus.repoId}
+  data-giscus-category={giscus.category}
+  data-giscus-category-id={giscus.categoryId}
+  data-giscus-term={term}
+>
+  <div class="comments-heading">
+    <h2 id="comments-title">一起聊聊</h2><span>由 Giscus 提供评论</span>
+  </div>
+  <p class="comments-intro">有新的发现，或是不同的想法？欢迎交流。使用 GitHub 账号即可留言。</p>
+  <div class="giscus"></div>
+  <p class="comments-status" role="status">评论将在滚动到此处时加载。</p>
+  <p class="comments-fallback">
+    评论无法显示？<a href={`https://github.com/${giscus.repo}/discussions`}>前往 GitHub 讨论区 ↗</a>
+  </p>
+  <noscript><p>请启用 JavaScript 加载评论，或前往 GitHub 讨论区参与交流。</p></noscript>
+</section>
+<script>
+  const section = document.querySelector<HTMLElement>('#comments');
+  if (section) {
+    const status = section.querySelector<HTMLElement>('.comments-status');
+    const container = section.querySelector<HTMLElement>('.giscus')!;
+    let loaded = false;
+    const theme = () => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    function load() {
+      if (!section || loaded) return;
+      loaded = true;
+      if (status) status.textContent = '正在加载评论…';
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      const settings = {
+        repo: section.dataset.giscusRepo!,
+        'repo-id': section.dataset.giscusRepoId!,
+        category: section.dataset.giscusCategory!,
+        'category-id': section.dataset.giscusCategoryId!,
+        // Use an explicit stable path, independent of preview hostname or URL encoding.
+        mapping: 'specific',
+        term: section.dataset.giscusTerm!,
+        strict: '1',
+        'reactions-enabled': '1',
+        'emit-metadata': '1',
+        'input-position': 'top',
+        theme: theme(),
+        lang: 'zh-CN',
+      };
+      for (const [key, value] of Object.entries(settings))
+        script.setAttribute(`data-${key}`, value);
+      script.onerror = () => {
+        if (status) status.textContent = '评论暂时无法加载，可以稍后重试或前往 GitHub 讨论区。';
+      };
+      container.append(script);
+      window.setTimeout(() => {
+        if (status && !status.hidden)
+          status.textContent = '评论加载较慢，可以稍后刷新或前往 GitHub 讨论区。';
+      }, 15000);
+    }
+    window.addEventListener('message', (event) => {
+      const frame = container.querySelector<HTMLIFrameElement>('iframe');
+      if (
+        event.origin !== 'https://giscus.app' ||
+        event.source !== frame?.contentWindow ||
+        !event.data?.giscus
+      )
+        return;
+      if (
+        event.data.giscus.error &&
+        !String(event.data.giscus.error).includes('Discussion not found')
+      ) {
+        if (status) {
+          status.hidden = false;
+          status.textContent = '评论暂时无法加载，可以前往 GitHub 讨论区。';
+        }
+      } else if (status) status.hidden = true;
+    });
+    window.addEventListener('theme-change', () => {
+      container
+        .querySelector<HTMLIFrameElement>('iframe')
+        ?.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme: theme() } } },
+          'https://giscus.app',
+        );
+    });
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            load();
+            observer.disconnect();
+          }
+        },
+        { rootMargin: '350px' },
+      );
+      observer.observe(section);
+    } else load();
+  }
+</script>

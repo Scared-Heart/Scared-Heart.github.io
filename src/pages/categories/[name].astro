@@ -1,0 +1,26 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, groups, type Post } from '../../lib/posts';
+export async function getStaticPaths() {
+  return groups(await getPosts(), 'categories').map(([name, posts]) => ({
+    params: { name },
+    props: { name, posts },
+  }));
+}
+interface Props {
+  name: string;
+  posts: Post[];
+}
+const { name, posts } = Astro.props;
+---
+
+<Base title={`分类：${name}`}
+  ><header class="page-heading">
+    <p class="eyebrow">TOPIC</p><h1>{name}</h1><p>
+      {posts.length} 篇相关记录 · <a class="text-link" href="/categories/">全部分类 →</a>
+    </p>
+  </header><div class="page-content post-grid">
+    {posts.map((post) => <PostCard post={post} />)}
+  </div></Base
+>

@@ -1,0 +1,38 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArchiveList from '../../components/ArchiveList.astro';
+import { getPosts, formatDate, type Post } from '../../lib/posts';
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const periods = [
+    ...new Set(
+      posts.flatMap((post) => {
+        const date = formatDate(post.data.date);
+        return [date.slice(0, 4), date.slice(0, 7).replace('-', '/')];
+      }),
+    ),
+  ];
+  return periods.map((period) => ({
+    params: { period },
+    props: {
+      period,
+      posts: posts.filter((post) =>
+        formatDate(post.data.date).replace('-', '/').startsWith(period),
+      ),
+    },
+  }));
+}
+interface Props {
+  period: string;
+  posts: Post[];
+}
+const { period, posts } = Astro.props;
+---
+
+<Base title={`${period} 归档`}
+  ><header class="page-heading">
+    <p class="eyebrow">ARCHIVE</p><h1>{period} 的记录</h1><p>
+      {posts.length} 篇文章 · <a class="text-link" href="/archives/">查看全部归档 →</a>
+    </p>
+  </header><div class="page-content"><ArchiveList posts={posts} /></div></Base
+>

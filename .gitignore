@@ -1,5 +1,12 @@
 node_modules/
+dist/
+.astro/
 public/
 db.json
 .deploy_git/
 *.log
+.DS_Store
+.env
+.env.*
+!.env.example
+static/img/banner-preview.webp

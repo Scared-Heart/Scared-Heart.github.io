@@ -1,0 +1,228 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Comments from '../components/Comments.astro';
+import Icon from '../components/Icon.astro';
+import {
+  getPosts,
+  excerpt,
+  formatDate,
+  postUrl,
+  taxonomyUrl,
+  readingMinutes,
+  type Post,
+} from '../lib/posts';
+import '../styles/article.css';
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[index - 1], older: posts[index + 1] },
+  }));
+}
+interface Props {
+  post: Post;
+  newer?: Post;
+  older?: Post;
+}
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+<Base
+  title={post.data.title}
+  description={excerpt(post)}
+  article
+  published={post.data.date}
+  updated={post.data.updated}
+>
+  <div class="article-top">
+    <a class="text-link subtle" href="/">← 所有文章</a><a class="text-link subtle" href="/archives/"
+      >按时间翻阅</a
+    >
+  </div>
+  <header class="article-header">
+    <div class="article-categories">
+      {post.data.categories.map((name) => <a href={taxonomyUrl('categories', name)}>{name}</a>)}
+    </div>
+    <h1>{post.data.title}</h1>
+    <div class="article-meta">
+      <span>Breeze Chan</span><span>·</span><time datetime={post.data.date.toISOString()}
+        >{formatDate(post.data.date)}</time
+      ><span>·</span><span>{readingMinutes(post.body)} 分钟阅读</span>{
+        post.data.updated && <span>更新于 {formatDate(post.data.updated)}</span>
+      }
+    </div>
+  </header>
+  <div class:list={['article-layout', { 'without-toc': !toc.length }]}>
+    <div class="article-main">
+      {
+        toc.length > 0 && (
+          <details class="mobile-toc">
+            <>
+              <summary>
+                本文目录 <span>{toc.filter((h) => h.depth === 2).length} 个章节</span>
+              </summary>
+              <nav aria-label="文章目录（移动端）">
+                {toc.map((heading) => (
+                  <a class:list={{ nested: heading.depth === 3 }} href={`#${heading.slug}`}>
+                    {heading.text}
+                  </a>
+                ))}
+              </nav>
+            </>
+          </details>
+        )
+      }
+      <article class="prose"><Content /></article>
+      <div class="article-ending">
+        <span>— 本文完 —</span>{
+          post.data.tags.length > 0 && (
+            <div class="article-tags">
+              {post.data.tags.map((name) => (
+                <a href={taxonomyUrl('tags', name)}># {name}</a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+      <nav class="post-navigation" aria-label="前后文章">
+        {
+          newer ? (
+            <a href={postUrl(newer.id)}>
+              <>
+                <span>← 更新的文章</span>
+                <strong>{newer.data.title}</strong>
+              </>
+            </a>
+          ) : (
+            <div />
+          )
+        }{
+          older && (
+            <a href={postUrl(older.id)}>
+              <>
+                <span>更早的文章 →</span>
+                <strong>{older.data.title}</strong>
+              </>
+            </a>
+          )
+        }
+      </nav>
+      {post.data.comments && <Comments term={`/${post.id}/`} />}
+    </div>
+    {
+      toc.length > 0 && (
+        <aside class="desktop-toc">
+          <nav aria-label="文章目录">
+            <>
+              <p class="eyebrow">ON THIS PAGE</p>
+              <h2>本文目录</h2>
+              <div class="toc-links">
+                {toc.map((heading) => (
+                  <a class:list={{ nested: heading.depth === 3 }} href={`#${heading.slug}`}>
+                    {heading.text}
+                  </a>
+                ))}
+              </div>
+              <a class="toc-top" href="#main">
+                回到顶部 ↑
+              </a>
+            </>
+          </nav>
+        </aside>
+      )
+    }
+  </div>
+  <dialog class="image-dialog" aria-label="图片放大预览">
+    <button class="icon-button image-close" type="button" aria-label="关闭图片预览"
+      ><Icon name="close" size={24} /></button
+    ><img alt="" /><p></p>
+  </dialog>
+  <script>
+    // Code copying uses textContent so no line numbers or control labels are copied.
+    document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block';
+      pre.before(wrapper);
+      wrapper.append(pre);
+      const button = document.createElement('button');
+      button.className = 'copy-code';
+      button.type = 'button';
+      button.textContent = '复制';
+      button.setAttribute('aria-label', '复制代码');
+      const status = document.createElement('span');
+      status.className = 'sr-only';
+      status.setAttribute('role', 'status');
+      wrapper.append(button, status);
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(
+            pre.querySelector('code')?.textContent || pre.textContent || '',
+          );
+          button.textContent = '已复制';
+          status.textContent = '代码已复制';
+        } catch {
+          button.textContent = '请手动选择复制';
+          status.textContent = '无法访问剪贴板，请选择代码手动复制';
+        }
+        window.setTimeout(() => {
+          button.textContent = '复制';
+        }, 2500);
+      });
+    });
+    document.querySelectorAll('.prose table').forEach((table) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'table-scroll';
+      wrapper.tabIndex = 0;
+      wrapper.setAttribute('role', 'region');
+      wrapper.setAttribute('aria-label', '文章表格，可横向滚动');
+      table.before(wrapper);
+      wrapper.append(table);
+    });
+    const dialog = document.querySelector<HTMLDialogElement>('.image-dialog')!;
+    document.querySelectorAll<HTMLImageElement>('.prose img').forEach((img) => {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      if (img.closest('a')) return;
+      const button = document.createElement('button');
+      button.className = 'zoom-image';
+      button.type = 'button';
+      button.setAttribute('aria-label', `放大图片：${img.alt || '文章配图'}`);
+      img.before(button);
+      button.append(img);
+      button.addEventListener('click', () => {
+        const target = dialog.querySelector('img')!;
+        target.src = img.currentSrc || img.src;
+        target.alt = img.alt;
+        dialog.querySelector('p')!.textContent = img.alt;
+        dialog.showModal();
+      });
+    });
+    dialog.querySelector('button')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.desktop-toc .toc-links a')];
+    if (links.length) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+          if (!visible) return;
+          for (const link of links) {
+            const current = decodeURIComponent(link.hash.slice(1)) === visible.target.id;
+            if (current) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          }
+        },
+        { rootMargin: '-10% 0px -65% 0px' },
+      );
+      document
+        .querySelectorAll('.prose h2, .prose h3')
+        .forEach((heading) => observer.observe(heading));
+    }
+  </script>
+</Base>

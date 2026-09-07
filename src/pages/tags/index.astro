@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import TaxonomyIndex from '../../components/TaxonomyIndex.astro';
+import { getPosts, groups } from '../../lib/posts';
+const tags = groups(await getPosts(), 'tags');
+---
+
+<Base title="文章标签"
+  ><header class="page-heading">
+    <p class="eyebrow">FOLLOW A THREAD</p><h1>顺着线索，继续探索</h1><p>
+      用一个关键词，找到相关的记录。
+    </p>
+  </header><div class="page-content"><TaxonomyIndex groups={tags} kind="tags" /></div></Base
+>

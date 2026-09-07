@@ -1,0 +1,75 @@
+---
+import { taxonomyUrl, type Post } from '../lib/posts';
+interface Props {
+  groups: [string, Post[]][];
+  kind: 'categories' | 'tags';
+}
+const { groups, kind } = Astro.props;
+---
+
+<div class="taxonomy-grid">
+  {
+    groups.map(([name, posts]) => (
+      <a href={taxonomyUrl(kind, name)}>
+        <>
+          <span class="taxonomy-name">
+            {kind === 'tags' && <span class="hash"># </span>}
+            {name}
+          </span>
+          <span class="taxonomy-count">
+            {posts.length} 篇 <span aria-hidden="true">↗</span>
+          </span>
+        </>
+      </a>
+    ))
+  }
+</div>
+<style>
+  .taxonomy-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+  }
+  .taxonomy-grid > a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+  }
+  .taxonomy-grid > a:hover {
+    border-color: var(--accent);
+  }
+  .taxonomy-name {
+    font-size: 15px;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .taxonomy-count {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .taxonomy-count span {
+    margin-left: 10px;
+  }
+  .hash {
+    color: var(--accent);
+  }
+  @media (max-width: 850px) {
+    .taxonomy-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 500px) {
+    .taxonomy-grid {
+      grid-template-columns: 1fr;
+    }
+    .taxonomy-grid > a {
+      padding: 20px;
+    }
+  }
+</style>

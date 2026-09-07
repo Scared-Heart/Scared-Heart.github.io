@@ -1,0 +1,106 @@
+---
+import { formatDate, postUrl, type Post } from '../lib/posts';
+interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+const years = [...new Set(posts.map((post) => formatDate(post.data.date).slice(0, 4)))];
+---
+
+<div class="archive-list">
+  {
+    years.map((year) => (
+      <section class="archive-year">
+        <>
+          <h2>
+            {year}
+            <span>
+              {posts.filter((post) => formatDate(post.data.date).startsWith(year)).length} 篇
+            </span>
+          </h2>
+          <div>
+            {posts
+              .filter((post) => formatDate(post.data.date).startsWith(year))
+              .map((post) => (
+                <a class="archive-entry" href={postUrl(post.id)}>
+                  <time datetime={post.data.date.toISOString()}>
+                    {formatDate(post.data.date).slice(5)}
+                  </time>
+                  <span>{post.data.title}</span>
+                  <span class="archive-arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              ))}
+          </div>
+        </>
+      </section>
+    ))
+  }
+</div>
+<style>
+  .archive-year {
+    display: grid;
+    grid-template-columns: 145px 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+  h2 {
+    font: italic 36px var(--display);
+    margin: 0;
+    color: var(--ink);
+  }
+  h2 span {
+    display: block;
+    font: 11px var(--body);
+    margin-top: 8px;
+    color: var(--muted);
+  }
+  .archive-entry {
+    display: flex;
+    gap: 25px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .archive-entry:last-child {
+    border-bottom: 0;
+  }
+  .archive-entry time {
+    font: 12px var(--mono);
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .archive-entry > span:nth-child(2) {
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .archive-entry:hover > span {
+    color: var(--accent);
+  }
+  .archive-arrow {
+    margin-left: auto;
+    color: var(--muted);
+  }
+  @media (max-width: 600px) {
+    .archive-year {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    h2 {
+      font-size: 30px;
+    }
+    h2 span {
+      display: inline;
+      margin-left: 13px;
+    }
+    .archive-entry {
+      gap: 15px;
+    }
+    .archive-entry > span:nth-child(2) {
+      font-size: 14px;
+    }
+  }
+</style>

@@ -1,0 +1,139 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { site } from '../config';
+interface Props {
+  title?: string;
+  description?: string;
+  article?: boolean;
+  published?: Date;
+  updated?: Date;
+  noindex?: boolean;
+}
+const {
+  title,
+  description = site.description,
+  article = false,
+  published,
+  updated,
+  noindex = false,
+} = Astro.props;
+const pageTitle = title ? `${title} · ${site.title}` : `${site.title} · ${site.author}`;
+const path = Astro.url.pathname;
+const canonical = new URL(path === '/404/' ? '/404.html' : path, site.url).href;
+const navigation = [
+  { label: '文章', href: '/' },
+  { label: '分类', href: '/categories/' },
+  { label: '归档', href: '/archives/' },
+  { label: '关于', href: '/about/' },
+];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.author} />
+    <meta name="theme-color" content="#f7f9f6" />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/img/favicon.ico" sizes="any" />
+    <link rel="alternate" type="application/rss+xml" title="apple pie RSS" href="/rss.xml" />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${site.url}/img/banner.jpg`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {updated && <meta property="article:modified_time" content={updated.toISOString()} />}
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem('theme');
+        document.documentElement.dataset.theme =
+          saved === 'dark' || saved === 'light'
+            ? saved
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+      } catch {
+        document.documentElement.dataset.theme = 'light';
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <header class="site-header shell">
+      <a class="brand" href="/" aria-label="apple pie 首页"
+        ><span class="brand-symbol"><Icon name="pie" size={24} /></span><span
+          >apple pie<span class="brand-dot">.</span></span
+        ></a
+      >
+      <nav aria-label="主导航">
+        {
+          navigation.map(({ label, href }) => (
+            <a
+              href={href}
+              aria-current={
+                (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined
+              }
+            >
+              {label}
+            </a>
+          ))
+        }
+      </nav>
+      <div class="header-tools">
+        <a class="icon-button" href="/search/" aria-label="搜索文章"><Icon name="search" /></a>
+        <button class="icon-button theme-toggle" aria-label="切换深浅色" type="button"
+          ><span class="light-icon"><Icon name="moon" /></span><span class="dark-icon"
+            ><Icon name="sun" /></span
+          ></button
+        >
+      </div>
+    </header>
+    <main id="main" class="shell"><slot /></main>
+    <footer class="site-footer shell">
+      <div><a class="footer-brand" href="/">apple pie.</a><p>技术、日常，还有一点好奇心。</p></div>
+      <div class="footer-right">
+        <div class="footer-links">
+          <a href={site.github} aria-label="Breeze Chan 的 GitHub"
+            ><Icon name="github" size={18} />GitHub</a
+          ><a href="/rss.xml"><Icon name="rss" size={18} />RSS</a><a href="/tags/">标签</a>
+        </div><p>© 2019–{new Date().getFullYear()} {site.author} <span>· Built with Astro</span></p>
+      </div>
+    </footer>
+    <script>
+      const button = document.querySelector<HTMLButtonElement>('.theme-toggle');
+      const setTheme = (theme: string) => {
+        document.documentElement.dataset.theme = theme;
+        button?.setAttribute('aria-label', theme === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+        window.dispatchEvent(new CustomEvent('theme-change', { detail: theme }));
+      };
+      setTheme(document.documentElement.dataset.theme || 'light');
+      button?.addEventListener('click', () => {
+        const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        setTheme(theme);
+        try {
+          localStorage.setItem('theme', theme);
+        } catch {
+          /* Browsing without storage is supported. */
+        }
+      });
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+        let saved = null;
+        try {
+          saved = localStorage.getItem('theme');
+        } catch {
+          /* Use the system preference. */
+        }
+        if (!saved) setTheme(event.matches ? 'dark' : 'light');
+      });
+    </script>
+  </body>
+</html>

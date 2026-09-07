@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="页面未找到" noindex
+  ><section class="not-found">
+    <p class="eyebrow">404 · PAGE NOT FOUND</p><h1>这一页，还没有写下。</h1><p>
+      链接可能有误，或者文章已经搬家。试试搜索，或回首页看看。
+    </p><div>
+      <a class="text-link" href="/">← 回到首页</a><a class="text-link" href="/search/">搜索文章 →</a
+      >
+    </div>
+  </section></Base
+>
+<style>
+  .not-found {
+    min-height: 65vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 50px 0;
+  }
+  .not-found h1 {
+    font: 36px/1.5 var(--display);
+    color: var(--ink);
+    margin: 0;
+  }
+  .not-found > p:not(.eyebrow) {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 480px;
+  }
+  .not-found > div {
+    display: flex;
+    gap: 30px;
+    margin-top: 22px;
+  }
+  @media (max-width: 600px) {
+    .not-found h1 {
+      font-size: 28px;
+    }
+  }
+</style>
