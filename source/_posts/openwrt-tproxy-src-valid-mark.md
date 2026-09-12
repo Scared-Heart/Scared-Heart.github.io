@@ -22,6 +22,12 @@ comments: true
 > **现象是下游客户端全部断网、路由器本机完全正常、且没有任何日志和丢包计数器**。
 > 解决：`tailscale set --netfilter-mode=off` 后重启（或把 `net.ipv4.conf.all.src_valid_mark` 覆盖为 0）。
 
+![一图看懂：同一个包、同一条 TPROXY 链路，在 src_valid_mark = 0 与 = 1 下的两条分支](/image/openwrt-tproxy-src-valid-mark/tproxy-src-valid-mark-zh.webp)
+
+*一图看懂：`src_valid_mark = 0` 时，源地址反查不携带 fwmark，落到 main 表的 `RTN_UNICAST` 路由 → 正常投递给 mihomo；
+`src_valid_mark = 1` 时反查带着 `fwmark 0x80` 再次命中 `table 80`（“所有目的地都算本地”）→ `RTN_LOCAL` → `-EINVAL`
+→ 被当作 martian source **静默丢弃**。*
+
 ## 现象
 
 一台 OpenWrt 软路由（`nikki` + `mihomo`，透明代理用 TPROXY 模式）出现了很迷惑的情况：
